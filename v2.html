@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Michael Roman — Solar Technical Representative</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.18/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.18/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.20/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.20/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.20/500-italic.css">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        paper: '#f6f4ef',
+        cream: '#efece4',
+        ink:   '#161512',
+        mute:  '#8b857a',
+        line:  '#e2ddd1',
+        accent:'#e8590c'
+      },
+      fontFamily: {
+        display: ['"Space Grotesk"','sans-serif'],
+        body: ['Inter','sans-serif'],
+        serif: ['Fraunces','serif']
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  ::selection{ background:#e8590c; color:#f6f4ef; }
+  html{ scroll-padding-top:96px; }
+  body{ background:#f6f4ef; }
+
+  .line-mask{ display:block; overflow:hidden; }
+  .line-inner{ display:block; will-change:transform; }
+
+  .serif-i{ font-family:Fraunces,serif; font-style:italic; font-weight:500; letter-spacing:-0.01em; }
+
+  /* underline link */
+  .u-link{ position:relative; }
+  .u-link::after{ content:''; position:absolute; left:0; bottom:-3px; height:1px; width:100%; background:currentColor; transform:scaleX(0); transform-origin:right; transition:transform .5s cubic-bezier(.76,0,.24,1); }
+  .u-link:hover::after{ transform:scaleX(1); transform-origin:left; }
+
+  /* big email underline sweep */
+  .sweep{ position:relative; }
+  .sweep::after{ content:''; position:absolute; left:0; bottom:-6px; height:2px; width:100%; background:#161512; transform:scaleX(0); transform-origin:right; transition:transform .7s cubic-bezier(.76,0,.24,1); }
+  .sweep:hover::after{ transform:scaleX(1); transform-origin:left; }
+
+  /* marquee */
+  .marquee{ overflow:hidden; }
+  .marquee-track{ display:flex; width:max-content; animation:marquee 30s linear infinite; }
+  @keyframes marquee{ from{ transform:translateX(0) } to{ transform:translateX(-50%) } }
+
+  /* project row */
+  .proj-img{ transform:scale(1.08); transition:transform 1.4s cubic-bezier(.2,.8,.2,1); }
+  .proj:hover .proj-img{ transform:scale(1); }
+  .proj .proj-arrow{ transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .5s; opacity:0; transform:translate(-8px,8px); }
+  .proj:hover .proj-arrow{ opacity:1; transform:translate(0,0); }
+  .proj .proj-title{ transition:transform .5s cubic-bezier(.2,.8,.2,1); }
+  .proj:hover .proj-title{ transform:translateX(10px); }
+
+  /* service row */
+  .svc{ transition:background .4s, padding .4s; }
+  .svc:hover{ background:#efece4; padding-left:1.5rem; padding-right:1.5rem; }
+  .svc .svc-num{ transition:color .4s; }
+  .svc:hover .svc-num{ color:#e8590c; }
+
+  /* loader */
+  #loader{ position:fixed; inset:0; z-index:90; background:#f6f4ef; display:flex; align-items:center; justify-content:center; }
+  .loader-char{ display:inline-block; }
+
+  /* cursor */
+  #cursorDot, #cursorRing{ position:fixed; left:0; top:0; pointer-events:none; z-index:80; border-radius:50%; }
+  #cursorDot{ width:6px; height:6px; background:#e8590c; margin:-3px 0 0 -3px; }
+  #cursorRing{ width:36px; height:36px; margin:-18px 0 0 -18px; border:1px solid rgba(22,21,18,.35); transition:width .3s,height .3s,margin .3s,border-color .3s; }
+  body.cursor-hover #cursorRing{ width:64px; height:64px; margin:-32px 0 0 -32px; border-color:#e8590c; }
+  @media (pointer:coarse){ #cursorDot,#cursorRing{ display:none } }
+
+  input,textarea,select{ color-scheme:light; }
+  .field{ background:transparent; border:0; border-bottom:1px solid #d8d2c4; border-radius:0; transition:border-color .4s; }
+  .field:focus{ outline:none; border-color:#e8590c; }
+
+  #menuOverlay{ clip-path:inset(0 0 100% 0); transition:clip-path .7s cubic-bezier(.76,0,.24,1); }
+  #menuOverlay.open{ clip-path:inset(0 0 0% 0); }
+
+  .bar-line{ transform-origin:left; }
+</style>
+</head>
+
+<body class="font-body text-ink antialiased overflow-x-hidden">
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="text-center">
+    <div id="loaderName" class="font-display font-bold text-2xl md:text-4xl tracking-[0.35em] uppercase overflow-hidden">MICHAEL ROMAN</div>
+    <div class="mt-6 flex items-center justify-center gap-4 text-xs tracking-[0.3em] text-mute uppercase">
+      <span>Solar Technical Representative</span>
+      <span id="loadPct" class="text-accent font-medium w-10 text-left">0%</span>
+    </div>
+  </div>
+</div>
+
+<div id="cursorDot"></div><div id="cursorRing"></div>
+
+<!-- HEADER -->
+<header id="header" class="fixed top-0 inset-x-0 z-50 transition-all duration-500">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-6 flex items-center justify-between">
+    <a href="#top" class="font-display font-bold tracking-[0.2em] uppercase text-sm">Michael Roman<span class="text-accent">.</span></a>
+    <nav class="hidden md:flex items-center gap-10 text-[13px] tracking-[0.15em] uppercase text-mute">
+      <a class="u-link hover:text-ink transition-colors" href="#work">Work</a>
+      <a class="u-link hover:text-ink transition-colors" href="#services">Services</a>
+      <a class="u-link hover:text-ink transition-colors" href="#about">About</a>
+      <a class="u-link hover:text-ink transition-colors" href="#capabilities">Capabilities</a>
+      <a href="#contact" data-magnetic class="ml-2 px-6 py-3 border border-ink text-ink hover:bg-ink hover:text-paper transition-colors duration-300">Contact</a>
+    </nav>
+    <button id="menuBtn" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menu">
+      <span class="block h-px w-7 bg-ink transition-all" id="mb1"></span>
+      <span class="block h-px w-7 bg-ink transition-all" id="mb2"></span>
+    </button>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<div id="menuOverlay" class="fixed inset-0 z-40 bg-ink text-paper flex flex-col justify-center px-10">
+  <nav class="space-y-6 font-display font-bold text-4xl uppercase tracking-wide">
+    <a class="block hover:text-accent transition-colors m-link" href="#work">Work</a>
+    <a class="block hover:text-accent transition-colors m-link" href="#services">Services</a>
+    <a class="block hover:text-accent transition-colors m-link" href="#about">About</a>
+    <a class="block hover:text-accent transition-colors m-link" href="#capabilities">Capabilities</a>
+    <a class="block hover:text-accent transition-colors m-link" href="#contact">Contact</a>
+  </nav>
+  <p class="mt-12 text-xs tracking-[0.25em] uppercase text-paper/50">San Diego, CA — +1 (619) 555-0123</p>
+</div>
+
+<!-- ============ HERO ============ -->
+<section id="top" class="relative min-h-screen flex flex-col justify-between overflow-hidden">
+  <canvas id="scene" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+  <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 w-full pt-40 md:pt-44">
+    <p id="heroMeta" class="text-[11px] md:text-xs tracking-[0.3em] uppercase text-mute mb-8 flex flex-wrap gap-x-8 gap-y-2">
+      <span>Solar Technical Representative</span><span class="hidden md:inline">—</span>
+      <span>Freelance Engineer</span><span class="hidden md:inline">—</span>
+      <span>32.7157° N / 117.1611° W</span>
+    </p>
+
+    <h1 class="font-display font-bold leading-[1.02] tracking-tight text-[clamp(2.6rem,8vw,7rem)]">
+      <span class="line-mask"><span class="line-inner">Solar, engineered</span></span>
+      <span class="line-mask"><span class="line-inner">with <em class="serif-i text-accent">intent</em> — from</span></span>
+      <span class="line-mask"><span class="line-inner">panel to grid.</span></span>
+    </h1>
+
+    <div id="heroSub" class="mt-10 grid md:grid-cols-[1fr_auto] gap-8 items-end">
+      <p class="max-w-md text-mute leading-relaxed">
+        I'm Michael Roman — an independent technical representative for owners, EPCs and manufacturers. I make sure every watt promised on paper shows up in the field.
+      </p>
+      <a href="#work" data-magnetic class="group inline-flex items-center gap-3 text-[13px] tracking-[0.2em] uppercase font-medium">
+        <span class="u-link">Selected work</span>
+        <span class="inline-block transition-transform group-hover:translate-y-1">↓</span>
+      </a>
+    </div>
+  </div>
+
+  <div id="heroStats" class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 w-full pb-10 mt-24">
+    <div class="grid grid-cols-3 divide-x divide-line border-t border-line pt-6">
+      <div class="pr-6"><p class="font-display font-bold text-3xl md:text-5xl"><span data-count="12">0</span><span class="text-accent">+</span></p><p class="mt-2 text-[11px] tracking-[0.25em] uppercase text-mute">Years in PV</p></div>
+      <div class="px-6"><p class="font-display font-bold text-3xl md:text-5xl"><span data-count="140">0</span></p><p class="mt-2 text-[11px] tracking-[0.25em] uppercase text-mute">MWp delivered</p></div>
+      <div class="pl-6"><p class="font-display font-bold text-3xl md:text-5xl"><span data-count="86">0</span></p><p class="mt-2 text-[11px] tracking-[0.25em] uppercase text-mute">Projects</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee border-y border-line bg-cream py-4">
+  <div class="marquee-track font-display text-xs tracking-[0.35em] uppercase text-mute">
+    <span class="px-8">Owner's Engineer <span class="text-accent">✦</span></span><span class="px-8">Design Review <span class="text-accent">✦</span></span><span class="px-8">Commissioning <span class="text-accent">✦</span></span><span class="px-8">IR Thermography <span class="text-accent">✦</span></span><span class="px-8">Performance Forensics <span class="text-accent">✦</span></span><span class="px-8">Due Diligence <span class="text-accent">✦</span></span><span class="px-8">Grid Connection <span class="text-accent">✦</span></span><span class="px-8">O&amp;M Advisory <span class="text-accent">✦</span></span>
+    <span class="px-8">Owner's Engineer <span class="text-accent">✦</span></span><span class="px-8">Design Review <span class="text-accent">✦</span></span><span class="px-8">Commissioning <span class="text-accent">✦</span></span><span class="px-8">IR Thermography <span class="text-accent">✦</span></span><span class="px-8">Performance Forensics <span class="text-accent">✦</span></span><span class="px-8">Due Diligence <span class="text-accent">✦</span></span><span class="px-8">Grid Connection <span class="text-accent">✦</span></span><span class="px-8">O&amp;M Advisory <span class="text-accent">✦</span></span>
+  </div>
+</div>
+
+<!-- ============ WORK ============ -->
+<section id="work" class="py-28 md:py-36">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+    <div class="flex items-end justify-between mb-16 md:mb-24" data-reveal>
+      <h2 class="font-display font-bold text-4xl md:text-6xl tracking-tight">Selected <em class="serif-i text-accent">work</em></h2>
+      <p class="text-[11px] tracking-[0.3em] uppercase text-mute">2019 — 2025</p>
+    </div>
+
+    <div class="space-y-24 md:space-y-32">
+      <!-- 01 -->
+      <article class="proj grid lg:grid-cols-12 gap-8 items-end" data-reveal>
+        <div class="lg:col-span-7 overflow-hidden">
+          <img src="https://image.qwenlm.ai/public_source/ad9c72fd-fdd1-4679-a00c-14ffeb2c2864/1aad434be-36f0-4897-866f-3ce2487a02ba.png" alt="Helios Ridge solar park" class="proj-img w-full h-[320px] md:h-[520px] object-cover">
+        </div>
+        <div class="lg:col-span-5 lg:pb-4">
+          <p class="text-[11px] tracking-[0.3em] uppercase text-mute">01 / Utility — 12 MWp</p>
+          <h3 class="proj-title font-display font-bold text-3xl md:text-4xl mt-4 tracking-tight">Helios Ridge Solar Park</h3>
+          <p class="mt-4 text-mute leading-relaxed max-w-sm">Owner's engineer through design review, FAT witnessing and full commissioning. Energized three weeks ahead of schedule.</p>
+          <p class="mt-6 text-[11px] tracking-[0.2em] uppercase text-mute">PVsyst · QA/QC · IEC 62446</p>
+          <span class="proj-arrow inline-block mt-6 text-2xl text-accent">↗</span>
+        </div>
+      </article>
+
+      <!-- 02 -->
+      <article class="proj grid lg:grid-cols-12 gap-8 items-end" data-reveal>
+        <div class="lg:col-span-5 lg:order-1 order-2 lg:pb-4">
+          <p class="text-[11px] tracking-[0.3em] uppercase text-mute">02 / C&amp;I Rooftop — 2.4 MWp</p>
+          <h3 class="proj-title font-display font-bold text-3xl md:text-4xl mt-4 tracking-tight">Metro Logistics Rooftop</h3>
+          <p class="mt-4 text-mute leading-relaxed max-w-sm">Landlord's technical representative: structural coordination, ballast review, site supervision and acceptance testing.</p>
+          <p class="mt-6 text-[11px] tracking-[0.2em] uppercase text-mute">Design Review · Supervision · SAT</p>
+          <span class="proj-arrow inline-block mt-6 text-2xl text-accent">↗</span>
+        </div>
+        <div class="lg:col-span-7 lg:order-2 order-1 overflow-hidden">
+          <img src="https://image.qwenlm.ai/public_source/ad9c72fd-fdd1-4679-a00c-14ffeb2c2864/1684be53e-cc47-47e3-83cb-9ea34c95cc04.png" alt="Metro logistics rooftop array" class="proj-img w-full h-[320px] md:h-[520px] object-cover">
+        </div>
+      </article>
+
+      <!-- 03 -->
+      <article class="proj grid lg:grid-cols-12 gap-8 items-end" data-reveal>
+        <div class="lg:col-span-7 overflow-hidden">
+          <img src="https://image.qwenlm.ai/public_source/ad9c72fd-fdd1-4679-a00c-14ffeb2c2864/184fc3a65-0456-4a59-9072-a514ecd54ace.png" alt="Thermal audit program" class="proj-img w-full h-[320px] md:h-[520px] object-cover">
+        </div>
+        <div class="lg:col-span-5 lg:pb-4">
+          <p class="text-[11px] tracking-[0.3em] uppercase text-mute">03 / Diagnostics — 340 MWp scanned</p>
+          <h3 class="proj-title font-display font-bold text-3xl md:text-4xl mt-4 tracking-tight">Portfolio Thermal Audit</h3>
+          <p class="mt-4 text-mute leading-relaxed max-w-sm">IR + I-V curve campaign across a fund's operating assets; recovered 4.8% average yield and drove warranty claims.</p>
+          <p class="mt-6 text-[11px] tracking-[0.2em] uppercase text-mute">IR Level 2 · I-V Tracing · Warranty</p>
+          <span class="proj-arrow inline-block mt-6 text-2xl text-accent">↗</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" class="py-28 md:py-36 bg-cream border-y border-line">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+    <div class="grid lg:grid-cols-[1fr_2fr] gap-12">
+      <div data-reveal>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-mute mb-6">Services</p>
+        <h2 class="font-display font-bold text-4xl md:text-5xl tracking-tight leading-tight">What I <em class="serif-i text-accent">do</em></h2>
+        <p class="mt-6 text-mute leading-relaxed max-w-xs">Independent, vendor-neutral engineering across the full PV lifecycle.</p>
+      </div>
+
+      <div class="divide-y divide-line border-y border-line" data-reveal>
+        <div class="svc py-8 grid md:grid-cols-[70px_1fr_auto] gap-4 items-baseline">
+          <span class="svc-num text-[11px] tracking-[0.25em] text-mute">/ 01</span>
+          <h3 class="font-display font-bold text-2xl md:text-3xl tracking-tight">Site Assessment &amp; Surveys</h3>
+          <p class="text-sm text-mute max-w-sm">Shade analysis, feasibility, bankable yield estimates.</p>
+        </div>
+        <div class="svc py-8 grid md:grid-cols-[70px_1fr_auto] gap-4 items-baseline">
+          <span class="svc-num text-[11px] tracking-[0.25em] text-mute">/ 02</span>
+          <h3 class="font-display font-bold text-2xl md:text-3xl tracking-tight">PV Design &amp; Review</h3>
+          <p class="text-sm text-mute max-w-sm">String sizing, SLDs, PVsyst simulation, lender audits.</p>
+        </div>
+        <div class="svc py-8 grid md:grid-cols-[70px_1fr_auto] gap-4 items-baseline">
+          <span class="svc-num text-[11px] tracking-[0.25em] text-mute">/ 03</span>
+          <h3 class="font-display font-bold text-2xl md:text-3xl tracking-tight">Owner's Engineer / QA-QC</h3>
+          <p class="text-sm text-mute max-w-sm">FAT, construction supervision, punch-list, acceptance.</p>
+        </div>
+        <div class="svc py-8 grid md:grid-cols-[70px_1fr_auto] gap-4 items-baseline">
+          <span class="svc-num text-[11px] tracking-[0.25em] text-mute">/ 04</span>
+          <h3 class="font-display font-bold text-2xl md:text-3xl tracking-tight">Commissioning &amp; Grid</h3>
+          <p class="text-sm text-mute max-w-sm">Cold/hot commissioning, protection checks, utility witnessing.</p>
+        </div>
+        <div class="svc py-8 grid md:grid-cols-[70px_1fr_auto] gap-4 items-baseline">
+          <span class="svc-num text-[11px] tracking-[0.25em] text-mute">/ 05</span>
+          <h3 class="font-display font-bold text-2xl md:text-3xl tracking-tight">Thermography &amp; Diagnostics</h3>
+          <p class="text-sm text-mute max-w-sm">Drone IR, I-V tracing, hotspot root-cause analysis.</p>
+        </div>
+        <div class="svc py-8 grid md:grid-cols-[70px_1fr_auto] gap-4 items-baseline">
+          <span class="svc-num text-[11px] tracking-[0.25em] text-mute">/ 06</span>
+          <h3 class="font-display font-bold text-2xl md:text-3xl tracking-tight">Performance &amp; O&amp;M Advisory</h3>
+          <p class="text-sm text-mute max-w-sm">PR audits, SCADA analytics, repowering studies.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="py-28 md:py-36">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 grid lg:grid-cols-12 gap-14">
+    <div class="lg:col-span-5" data-reveal>
+      <div class="overflow-hidden">
+        <img src="michael-roman/image.png" 
+		   alt="Michael Roman" class="proj-img w-full h-[480px] md:h-[600px] object-cover object-top">
+      </div>
+      <p class="mt-4 text-[11px] tracking-[0.25em] uppercase text-mute">Michael Roman — San Diego, CA</p>
+    </div>
+
+    <div class="lg:col-span-7 lg:pl-10">
+      <p class="text-[11px] tracking-[0.3em] uppercase text-mute mb-6" data-reveal>About</p>
+      <h2 class="font-display font-bold text-3xl md:text-5xl tracking-tight leading-[1.15]" data-reveal>
+        The bridge between <em class="serif-i text-accent">the boardroom</em> and the array field.
+      </h2>
+      <p class="mt-8 text-mute leading-relaxed max-w-2xl" data-reveal>
+        For over a decade I've represented investors, developers and manufacturers as an independent engineer. My mandate is simple: translate engineering detail into decisions — reviewing designs, witnessing tests, leading commissioning, and turning SCADA data into reports a lender can trust.
+      </p>
+
+      <div class="mt-12 divide-y divide-line border-y border-line" data-reveal>
+        <div class="py-5 grid grid-cols-[110px_1fr] gap-6 items-baseline"><span class="text-[11px] tracking-[0.25em] uppercase text-mute">Certified</span><p class="font-medium">NABCEP PV Installation Professional · IEC 62446 Commissioning</p></div>
+        <div class="py-5 grid grid-cols-[110px_1fr] gap-6 items-baseline"><span class="text-[11px] tracking-[0.25em] uppercase text-mute">Thermography</span><p class="font-medium">Certified Thermographer — Level 2 (drone &amp; handheld)</p></div>
+        <div class="py-5 grid grid-cols-[110px_1fr] gap-6 items-baseline"><span class="text-[11px] tracking-[0.25em] uppercase text-mute">Safety</span><p class="font-medium">NEBOSH / HSE Site Supervisor</p></div>
+        <div class="py-5 grid grid-cols-[110px_1fr] gap-6 items-baseline"><span class="text-[11px] tracking-[0.25em] uppercase text-mute">Based</span><p class="font-medium">San Diego, California — deployed worldwide</p></div>
+      </div>
+
+      <blockquote class="mt-12 max-w-2xl" data-reveal>
+        <p class="serif-i text-2xl md:text-3xl leading-snug">"Every report I sign is written as if a lender, an insurer and a judge will read it — because someday, one of them might."</p>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPABILITIES ============ -->
+<section id="capabilities" class="py-28 md:py-36 bg-cream border-y border-line">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 grid lg:grid-cols-2 gap-20">
+    <div>
+      <p class="text-[11px] tracking-[0.3em] uppercase text-mute mb-6" data-reveal>Capabilities</p>
+      <h2 class="font-display font-bold text-4xl md:text-5xl tracking-tight mb-14" data-reveal>Core <em class="serif-i text-accent">competencies</em></h2>
+
+      <div class="space-y-10" data-reveal>
+        <div><div class="flex justify-between text-sm font-medium mb-3"><span>PV System Design &amp; Simulation</span><span class="text-mute">95</span></div><div class="h-px bg-line relative"><div class="bar-line absolute inset-0 bg-ink" data-level="95"></div></div></div>
+        <div><div class="flex justify-between text-sm font-medium mb-3"><span>Commissioning &amp; Testing</span><span class="text-mute">92</span></div><div class="h-px bg-line relative"><div class="bar-line absolute inset-0 bg-ink" data-level="92"></div></div></div>
+        <div><div class="flex justify-between text-sm font-medium mb-3"><span>Performance Analysis &amp; SCADA</span><span class="text-mute">90</span></div><div class="h-px bg-line relative"><div class="bar-line absolute inset-0 bg-ink" data-level="90"></div></div></div>
+        <div><div class="flex justify-between text-sm font-medium mb-3"><span>IR Thermography &amp; Diagnostics</span><span class="text-mute">88</span></div><div class="h-px bg-line relative"><div class="bar-line absolute inset-0 bg-ink" data-level="88"></div></div></div>
+        <div><div class="flex justify-between text-sm font-medium mb-3"><span>Stakeholder &amp; Contract Management</span><span class="text-mute">85</span></div><div class="h-px bg-line relative"><div class="bar-line absolute inset-0 bg-ink" data-level="85"></div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-[11px] tracking-[0.3em] uppercase text-mute mb-6" data-reveal>Toolkit</p>
+      <h2 class="font-display font-bold text-4xl md:text-5xl tracking-tight mb-14" data-reveal>Daily <em class="serif-i text-accent">instruments</em></h2>
+      <div class="flex flex-wrap gap-x-8 gap-y-5 text-sm font-medium" data-reveal>
+        <span class="u-link cursor-default">PVsyst</span><span class="u-link cursor-default">AutoCAD</span><span class="u-link cursor-default">HelioScope</span><span class="u-link cursor-default">FLIR Tools</span><span class="u-link cursor-default">Solmetric I-V 500</span><span class="u-link cursor-default">Power BI</span><span class="u-link cursor-default">Python · pandas</span><span class="u-link cursor-default">ETAP</span><span class="u-link cursor-default">MS Project</span><span class="u-link cursor-default">Drone Pilot (A2)</span>
+      </div>
+
+      <div class="mt-16 divide-y divide-line border-y border-line" data-reveal>
+        <div class="py-6 grid grid-cols-[110px_1fr] gap-6"><span class="text-[11px] tracking-[0.25em] uppercase text-mute pt-1">Reference 01</span><p class="text-sm leading-relaxed text-mute">"Michael caught a string-design flaw our EPC missed. His review paid for itself forty times over before COD." — <span class="text-ink font-medium">M. Keller, GreenYield Capital</span></p></div>
+        <div class="py-6 grid grid-cols-[110px_1fr] gap-6"><span class="text-[11px] tracking-[0.25em] uppercase text-mute pt-1">Reference 02</span><p class="text-sm leading-relaxed text-mute">"The most rigorous commissioning lead we've worked with. Utilities love his paperwork." — <span class="text-ink font-medium">R. Sandoval, Helios EPC Group</span></p></div>
+        <div class="py-6 grid grid-cols-[110px_1fr] gap-6"><span class="text-[11px] tracking-[0.25em] uppercase text-mute pt-1">Reference 03</span><p class="text-sm leading-relaxed text-mute">"Clear data, clear claims, zero drama with the module supplier." — <span class="text-ink font-medium">A. Tanaka, SunBridge Partners</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="py-28 md:py-40">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+    <p class="text-[11px] tracking-[0.3em] uppercase text-mute mb-8" data-reveal>Contact — response within 24h</p>
+    <h2 class="font-display font-bold tracking-tight text-[clamp(2.2rem,7vw,6rem)] leading-[1.05]" data-reveal>
+      Let's put your next project<br><em class="serif-i text-accent">under the sun.</em>
+    </h2>
+
+    <div class="mt-16 grid lg:grid-cols-2 gap-16">
+      <div class="space-y-8" data-reveal>
+        <div>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-mute mb-2">Email</p>
+          <a href="mailto:michaelroman@gmail.com" class="sweep font-display font-bold text-xl md:text-3xl tracking-tight break-all">michaelroman@gmail.com</a>
+        </div>
+        <div>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-mute mb-2">Phone</p>
+          <a href="tel:+16195550123" class="sweep font-display font-bold text-xl md:text-3xl tracking-tight">+1 (619) 555-0123</a>
+        </div>
+        <div>
+          <p class="text-[11px] tracking-[0.25em] uppercase text-mute mb-2">Location</p>
+          <p class="font-display font-bold text-xl md:text-3xl tracking-tight">San Diego, CA <span class="text-mute text-base font-normal">— deployed worldwide</span></p>
+        </div>
+        <p class="pt-4 text-sm text-mute flex items-center gap-3"><span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span> Currently accepting Q3 freelance engagements.</p>
+      </div>
+
+      <form id="contactForm" class="space-y-10" data-reveal>
+        <div class="grid md:grid-cols-2 gap-10">
+          <div><label class="text-[11px] tracking-[0.25em] uppercase text-mute" for="fName">Name</label><input id="fName" required placeholder="Jane Developer" class="field mt-2 w-full py-3 text-sm placeholder-mute/60"></div>
+          <div><label class="text-[11px] tracking-[0.25em] uppercase text-mute" for="fEmail">Email</label><input id="fEmail" type="email" required placeholder="jane@company.com" class="field mt-2 w-full py-3 text-sm placeholder-mute/60"></div>
+        </div>
+        <div><label class="text-[11px] tracking-[0.25em] uppercase text-mute" for="fType">Project type</label>
+          <select id="fType" class="field mt-2 w-full py-3 text-sm bg-transparent">
+            <option>Owner's Engineer / Technical Rep</option><option>Design Review</option><option>Commissioning</option><option>Thermal / Performance Audit</option><option>O&amp;M Advisory</option><option>Other</option>
+          </select></div>
+        <div><label class="text-[11px] tracking-[0.25em] uppercase text-mute" for="fMsg">Message</label><textarea id="fMsg" rows="4" required placeholder="Site, capacity, timeline…" class="field mt-2 w-full py-3 text-sm placeholder-mute/60 resize-none"></textarea></div>
+        <button type="submit" id="sendBtn" data-magnetic class="px-10 py-4 bg-ink text-paper text-[13px] tracking-[0.25em] uppercase font-medium hover:bg-accent transition-colors duration-300">Send inquiry →</button>
+        <p id="formNote" class="hidden text-sm font-medium text-accent">✔ Received — I'll reply within 24 hours.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-line py-10">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] tracking-[0.25em] uppercase text-mute">
+    <p>© <span id="year"></span> Michael Roman</p>
+    <p class="serif-i text-sm normal-case tracking-normal text-ink">Solar Technical Representative — Freelance Engineer</p>
+    <a href="#top" class="u-link hover:text-ink transition-colors">Back to top ↑</a>
+  </div>
+</footer>
+
+<script>
+/* ================= THREE.JS — MINIMAL LIGHT SCENE ================= */
+(function(){
+  if (!window.THREE) return;
+  var heroCanvas = document.getElementById('scene');
+  var heroSection = document.getElementById('top');
+  var renderer = new THREE.WebGLRenderer({ canvas: heroCanvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  var lightScene = new THREE.Scene();
+  lightScene.fog = new THREE.FogExp2(0xf6f4ef, 0.03);
+
+  var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 2.1, 10);
+
+  lightScene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  var warmDir = new THREE.DirectionalLight(0xffd9a8, 0.9);
+  warmDir.position.set(6, 8, 4);
+  lightScene.add(warmDir);
+
+  /* sun: small amber sphere + thin ink rings */
+  var sunGroup = new THREE.Group();
+  var sunCore = new THREE.Mesh(new THREE.SphereGeometry(0.55, 48, 48), new THREE.MeshBasicMaterial({ color: 0xe8590c }));
+  sunGroup.add(sunCore);
+  var ringThin = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.012, 8, 120), new THREE.MeshBasicMaterial({ color: 0x161512, transparent: true, opacity: 0.55 }));
+  var ringWide = new THREE.Mesh(new THREE.TorusGeometry(1.7, 0.006, 8, 120), new THREE.MeshBasicMaterial({ color: 0x161512, transparent: true, opacity: 0.25 }));
+  ringThin.rotation.x = 1.25; ringWide.rotation.x = -1.05; ringWide.rotation.y = 0.35;
+  sunGroup.add(ringThin); sunGroup.add(ringWide);
+  var orbitBead = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), new THREE.MeshBasicMaterial({ color: 0x161512 }));
+  sunGroup.add(orbitBead);
+  sunGroup.position.set(5.4, 3.6, -6);
+  lightScene.add(sunGroup);
+
+  /* minimal panel field */
+  var fieldGroup = new THREE.Group();
+  var slabGeo = new THREE.BoxGeometry(1.7, 0.05, 1.05);
+  var slabMat = new THREE.MeshStandardMaterial({ color: 0x1c1c1c, metalness: 0.55, roughness: 0.4 });
+  var postGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.45, 8);
+  var postMat = new THREE.MeshStandardMaterial({ color: 0xb9b2a4, metalness: 0.4, roughness: 0.6 });
+  var COLS = 9, ROWS = 5;
+  for (var rr = 0; rr < ROWS; rr++){
+    for (var cc = 0; cc < COLS; cc++){
+      var cell = new THREE.Group();
+      var slab = new THREE.Mesh(slabGeo, slabMat);
+      slab.rotation.x = -0.5; slab.position.y = 0.5;
+      cell.add(slab);
+      var postA = new THREE.Mesh(postGeo, postMat); postA.position.set(-0.6, 0.22, 0.32); cell.add(postA);
+      var postB = new THREE.Mesh(postGeo, postMat); postB.position.set(0.6, 0.22, 0.32); cell.add(postB);
+      cell.position.set((cc - (COLS - 1) / 2) * 2.2, 0, -rr * 2.0 - 1.2);
+      fieldGroup.add(cell);
+    }
+  }
+  fieldGroup.position.y = -1.7;
+  lightScene.add(fieldGroup);
+
+  var groundGrid = new THREE.GridHelper(70, 46, 0xd8d2c4, 0xe7e2d6);
+  groundGrid.position.y = -1.72;
+  lightScene.add(groundGrid);
+
+  /* sparse amber particles */
+  var PARTS = 260;
+  var partGeo = new THREE.BufferGeometry();
+  var partPos = new Float32Array(PARTS * 3);
+  var partSpd = new Float32Array(PARTS);
+  for (var pi = 0; pi < PARTS; pi++){
+    partPos[pi*3]   = (Math.random() - 0.5) * 30;
+    partPos[pi*3+1] = Math.random() * 12 - 2;
+    partPos[pi*3+2] = (Math.random() - 0.5) * 22 - 2;
+    partSpd[pi] = 0.003 + Math.random() * 0.008;
+  }
+  partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+  var dustCloud = new THREE.Points(partGeo, new THREE.PointsMaterial({ color: 0xe8590c, size: 0.045, transparent: true, opacity: 0.5, depthWrite: false }));
+  lightScene.add(dustCloud);
+
+  var mx = 0, my = 0;
+  window.addEventListener('pointermove', function(ev){
+    mx = (ev.clientX / window.innerWidth - 0.5) * 2;
+    my = (ev.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  function sizeScene(){
+    var w = heroSection.clientWidth, h = heroSection.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', sizeScene);
+  sizeScene();
+
+  var clock = new THREE.Clock();
+  function animateScene(){
+    requestAnimationFrame(animateScene);
+    var t = clock.getElapsedTime();
+    ringThin.rotation.z = t * 0.3;
+    ringWide.rotation.z = -t * 0.18;
+    orbitBead.position.set(Math.cos(t * 0.6) * 1.15, Math.sin(t * 0.6) * 1.15 * Math.sin(1.25), Math.sin(t * 0.6) * 1.15 * Math.cos(1.25));
+    var attr = partGeo.getAttribute('position');
+    for (var pi2 = 0; pi2 < PARTS; pi2++){
+      var yy = attr.getY(pi2) + partSpd[pi2];
+      if (yy > 10) yy = -2;
+      attr.setY(pi2, yy);
+    }
+    attr.needsUpdate = true;
+    camera.position.x += (mx * 0.9 - camera.position.x) * 0.03;
+    camera.position.y += (2.1 - my * 0.5 - camera.position.y) * 0.03;
+    camera.lookAt(0, 1.2, -4);
+    renderer.render(lightScene, camera);
+  }
+  animateScene();
+})();
+
+/* ================= ANIMATED UI (GSAP) ================= */
+(function(){
+  if (!window.gsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* loader */
+  var loadTl = gsap.timeline();
+  var chars = document.getElementById('loaderName').textContent.split('');
+  document.getElementById('loaderName').innerHTML = chars.map(function(c){ return '<span class="loader-char">' + (c === ' ' ? '&nbsp;' : c) + '</span>'; }).join('');
+  var pctObj = { v: 0 };
+  loadTl
+    .from('.loader-char', { yPercent: 120, opacity: 0, stagger: 0.045, duration: 0.9, ease: 'power4.out' })
+    .to(pctObj, { v: 100, duration: 1.4, ease: 'power2.inOut', onUpdate: function(){ document.getElementById('loadPct').textContent = Math.round(pctObj.v) + '%'; } }, 0.2)
+    .to('#loader', { yPercent: -100, duration: 0.9, ease: 'power4.inOut', delay: 0.2, onComplete: function(){ document.getElementById('loader').style.display = 'none'; } })
+    .from('.line-inner', { yPercent: 115, duration: 1.2, stagger: 0.12, ease: 'power4.out' }, '-=0.35')
+    .from('#heroMeta', { opacity: 0, y: 20, duration: 0.8, ease: 'power3.out' }, '-=0.8')
+    .from('#heroSub', { opacity: 0, y: 30, duration: 0.8, ease: 'power3.out' }, '-=0.6')
+    .from('#heroStats', { opacity: 0, y: 30, duration: 0.8, ease: 'power3.out' }, '-=0.6');
+
+  /* scroll reveals */
+  gsap.utils.toArray('[data-reveal]').forEach(function(el){
+    gsap.fromTo(el, { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 86%' } });
+  });
+
+  /* counters */
+  gsap.utils.toArray('[data-count]').forEach(function(el){
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    var obj = { v: 0 };
+    ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true, onEnter: function(){
+      gsap.to(obj, { v: target, duration: 1.8, ease: 'power2.out', onUpdate: function(){ el.textContent = Math.round(obj.v); } });
+    }});
+  });
+
+  /* bars */
+  gsap.utils.toArray('.bar-line').forEach(function(el){
+    var lvl = parseFloat(el.getAttribute('data-level')) / 100;
+    gsap.fromTo(el, { scaleX: 0 }, { scaleX: lvl, duration: 1.4, ease: 'power3.inOut', scrollTrigger: { trigger: el, start: 'top 88%' } });
+  });
+
+  /* header state */
+  var header = document.getElementById('header');
+  var lastScroll = 0;
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY;
+    if (y > 60){ header.style.background = 'rgba(246,244,239,0.85)'; header.style.backdropFilter = 'blur(12px)'; header.style.borderBottom = '1px solid #e2ddd1'; }
+    else { header.style.background = 'transparent'; header.style.backdropFilter = 'none'; header.style.borderBottom = 'none'; }
+    if (y > lastScroll && y > 500) gsap.to(header, { yPercent: -100, duration: 0.45, ease: 'power2.out' });
+    else gsap.to(header, { yPercent: 0, duration: 0.45, ease: 'power2.out' });
+    lastScroll = y;
+  });
+
+  /* magnetic */
+  gsap.utils.toArray('[data-magnetic]').forEach(function(btn){
+    btn.addEventListener('mousemove', function(e){
+      var r = btn.getBoundingClientRect();
+      gsap.to(btn, { x: (e.clientX - r.left - r.width / 2) * 0.25, y: (e.clientY - r.top - r.height / 2) * 0.35, duration: 0.4 });
+    });
+    btn.addEventListener('mouseleave', function(){ gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1,0.4)' }); });
+  });
+
+  /* cursor */
+  if (window.matchMedia('(pointer:fine)').matches){
+    var dot = document.getElementById('cursorDot'), ring = document.getElementById('cursorRing');
+    var dx = gsap.quickTo(dot, 'x', { duration: 0.12, ease: 'power2' });
+    var dy = gsap.quickTo(dot, 'y', { duration: 0.12, ease: 'power2' });
+    var rx = gsap.quickTo(ring, 'x', { duration: 0.45, ease: 'power3' });
+    var ry = gsap.quickTo(ring, 'y', { duration: 0.45, ease: 'power3' });
+    window.addEventListener('pointermove', function(e){ dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); });
+    document.querySelectorAll('a, button, input, textarea, select, .svc, .proj').forEach(function(el){
+      el.addEventListener('mouseenter', function(){ document.body.classList.add('cursor-hover'); });
+      el.addEventListener('mouseleave', function(){ document.body.classList.remove('cursor-hover'); });
+    });
+  }
+
+  /* mobile menu */
+  var menuBtn = document.getElementById('menuBtn'), overlay = document.getElementById('menuOverlay'), open = false;
+  menuBtn.addEventListener('click', function(){
+    open = !open;
+    overlay.classList.toggle('open', open);
+    document.getElementById('mb1').style.transform = open ? 'translateY(3.5px) rotate(45deg)' : 'none';
+    document.getElementById('mb2').style.transform = open ? 'translateY(-3.5px) rotate(-45deg)' : 'none';
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (open) gsap.from('.m-link', { y: 40, opacity: 0, stagger: 0.07, duration: 0.7, ease: 'power3.out', delay: 0.25 });
+  });
+  document.querySelectorAll('.m-link').forEach(function(l){ l.addEventListener('click', function(){ menuBtn.click(); }); });
+
+  /* form */
+  document.getElementById('contactForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var btn = document.getElementById('sendBtn');
+    btn.textContent = 'Sending…';
+    setTimeout(function(){
+      document.getElementById('formNote').classList.remove('hidden');
+      btn.textContent = 'Sent ✔';
+      ev.target.reset();
+      setTimeout(function(){ btn.textContent = 'Send inquiry →'; }, 3000);
+    }, 800);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
