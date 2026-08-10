@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growth Plan — Google Ads × Meta · Michael Roman</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.18/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.18/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.20/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.20/600.css">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        paper: '#F6F5F1',
+        ink: '#14161A',
+        muted: '#6F7379',
+        line: '#E3E1D8',
+        accent: '#FF6B2C',
+        accent2: '#E85A1B'
+      },
+      fontFamily: {
+        display: ['"Space Grotesk"', 'sans-serif'],
+        body: ['Inter', 'sans-serif']
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  ::selection{ background:#FF6B2C; color:#fff; }
+  html, body{ height:100%; overflow:hidden; background:#F6F5F1; }
+  body{ -webkit-font-smoothing:antialiased; }
+
+  /* ---------- slide engine ---------- */
+  .slide{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transform:translateX(56px);
+    transition:opacity .6s ease, transform .6s cubic-bezier(.22,.9,.24,1), visibility 0s linear .6s;
+  }
+  .slide.active{ opacity:1; visibility:visible; transform:translateX(0); transition:opacity .6s ease, transform .6s cubic-bezier(.22,.9,.24,1); z-index:10; }
+  .slide.prev{ transform:translateX(-56px); }
+  .slide-scroll{ max-height:calc(100vh - 150px); overflow-y:auto; width:100%; scrollbar-width:thin; }
+
+  .anim{ opacity:0; transform:translateY(26px); transition:opacity .7s ease var(--d,0s), transform .7s cubic-bezier(.22,.9,.24,1) var(--d,0s); }
+  .slide.active .anim{ opacity:1; transform:translateY(0); }
+
+  .w-outer{ display:inline-block; overflow:hidden; vertical-align:bottom; padding-bottom:.08em; margin-bottom:-.08em; }
+  .w-inner{ display:inline-block; transform:translateY(118%); transition:transform .85s cubic-bezier(.22,.9,.24,1); }
+  .slide.active .w-inner{ transform:translateY(0); }
+  .split em{ font-style:normal; color:#FF6B2C; }
+
+  .mask{ display:block; overflow:hidden; }
+  .mask-inner{ display:block; transform:translateY(112%); transition:transform .9s cubic-bezier(.22,.9,.24,1) var(--d,0s); }
+  .slide.active .mask-inner{ transform:translateY(0); }
+
+  .draw{ transform:scaleX(0); transform-origin:left; transition:transform 1.1s cubic-bezier(.22,.9,.24,1) var(--d,.2s); }
+  .slide.active .draw{ transform:scaleX(1); }
+
+  .ffill{ height:100%; width:0; border-radius:9999px; transition:width 1.1s cubic-bezier(.22,.9,.24,1) var(--fd,.3s); }
+  .slide.active .ffill{ width:var(--w); }
+
+  .bseg{ width:0; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:12px; letter-spacing:.05em; transition:width 1.1s cubic-bezier(.22,.9,.24,1) var(--bd,.3s); white-space:nowrap; overflow:hidden; }
+  .slide.active .bseg{ width:var(--w); }
+
+  .sfbar{ width:0; transition:width .9s cubic-bezier(.22,.9,.24,1) var(--d,.2s); overflow:hidden; }
+  .slide.active .sfbar{ width:var(--w); }
+
+  .donut-seg{ fill:none; stroke-width:13; stroke-dasharray:0 503; transition:stroke-dasharray 1.2s cubic-bezier(.22,.9,.24,1); }
+  .slide.active .seg-1{ stroke-dasharray:351.9 503; transition-delay:.25s; }
+  .slide.active .seg-2{ stroke-dasharray:100.5 503; transition-delay:.8s; }
+  .slide.active .seg-3{ stroke-dasharray:50.2 503;  transition-delay:1.05s; }
+
+  .marquee{ overflow:hidden; }
+  .marquee-track{ display:flex; width:max-content; animation:marquee 30s linear infinite; }
+  @keyframes marquee{ from{ transform:translateX(0) } to{ transform:translateX(-50%) } }
+
+  .nudge{ animation:nudge 1.8s ease-in-out infinite; }
+  @keyframes nudge{ 0%,100%{ transform:translateX(0); opacity:.5 } 50%{ transform:translateX(6px); opacity:1 } }
+
+  .breathe{ animation:breathe 2.4s ease-in-out infinite; }
+  @keyframes breathe{ 0%,100%{ transform:scale(1); opacity:1 } 50%{ transform:scale(.72); opacity:.55 } }
+  .spin-slower{ animation:spinSlow 40s linear infinite; }
+  @keyframes spinSlow{ to{ transform:rotate(360deg) } }
+
+  #ringFg{ transition:stroke-dashoffset .6s cubic-bezier(.22,.9,.24,1); }
+
+  .tbl{ width:100%; border-collapse:collapse; font-size:13px; }
+  .tbl th{ text-transform:uppercase; letter-spacing:.18em; font-size:9.5px; color:#8A8E94; text-align:left; padding:12px 16px; border-bottom:1px solid #E3E1D8; }
+  .tbl td{ padding:14px 16px; border-bottom:1px solid #ECEAE2; color:#3C4046; }
+  .tbl tr:last-child td{ border-bottom:none; }
+  .tbl .num{ font-family:'Space Grotesk'; font-weight:700; color:#14161A; }
+  .tbl tfoot td{ background:#F1EFE8; }
+
+  .m-card{ transition:transform .45s cubic-bezier(.22,.9,.24,1), border-color .45s, box-shadow .45s; }
+  .m-card:hover{ transform:translateY(-5px); border-color:#C9C6BA; box-shadow:0 18px 40px -22px rgba(20,22,26,.18); }
+
+  .dot-nav{ width:7px; height:7px; border-radius:9999px; background:#D5D2C6; transition:all .35s ease; cursor:pointer; }
+  .dot-nav:hover{ background:#A8A598; }
+  .dot-nav.active{ width:22px; background:#FF6B2C; }
+
+  .ctl{ transition:all .35s cubic-bezier(.22,.9,.24,1); }
+  .ctl:hover:not(:disabled){ transform:translateY(-2px); }
+  .ctl:disabled{ opacity:.3; cursor:default; }
+  .ctl:hover .arr{ transform:translateX(3px); }
+  .ctl:hover .arr-l{ transform:translateX(-3px); }
+  .arr, .arr-l{ transition:transform .3s ease; display:inline-block; }
+
+  #progressBar{ transition:width .5s cubic-bezier(.22,.9,.24,1); }
+
+  .tag{ transition:all .3s ease; }
+  .tag:hover{ border-color:#14161A; transform:translateY(-2px); }
+
+  /* ---------- plain-words callout ---------- */
+  .plain{ display:flex; gap:12px; align-items:flex-start; background:#FFFFFF; border:1px solid #E3E1D8; border-left:3px solid #FF6B2C; border-radius:14px; padding:14px 18px; }
+  .plain .p-icon{ flex-shrink:0; width:28px; height:28px; border-radius:9999px; background:rgba(255,107,44,.12); color:#FF6B2C; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+
+  /* ---------- jargon tooltips ---------- */
+  .tip{ position:relative; border-bottom:1.5px dashed #B9B6A9; cursor:help; outline:none; }
+  .tip::after{
+    content:attr(data-tip);
+    position:absolute; left:50%; bottom:calc(100% + 9px);
+    transform:translateX(-50%) translateY(5px);
+    width:max-content; max-width:240px;
+    background:#14161A; color:#F6F5F1;
+    font-size:11px; line-height:1.5; font-weight:400; letter-spacing:normal; text-transform:none; text-align:left;
+    padding:9px 12px; border-radius:10px;
+    opacity:0; pointer-events:none; z-index:80;
+    transition:opacity .25s ease, transform .25s ease;
+    box-shadow:0 14px 34px -12px rgba(20,22,26,.45);
+    white-space:normal;
+  }
+  .tip::before{
+    content:''; position:absolute; left:50%; bottom:calc(100% + 3px); transform:translateX(-50%);
+    border:6px solid transparent; border-top-color:#14161A;
+    opacity:0; transition:opacity .25s ease; z-index:80;
+  }
+  .tip:hover::after, .tip:focus::after{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .tip:hover::before, .tip:focus::before{ opacity:1; }
+
+  /* ---------- simulator sliders ---------- */
+  .sim-range{ -webkit-appearance:none; appearance:none; width:100%; height:10px; border-radius:9999px; background:#E3E1D8; outline:none; cursor:pointer; }
+  .sim-range::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none; width:30px; height:30px; border-radius:9999px;
+    background:#14161A; border:5px solid #F6F5F1; box-shadow:0 3px 12px rgba(20,22,26,.35);
+    cursor:grab; transition:transform .2s ease, background .2s ease;
+  }
+  .sim-range::-webkit-slider-thumb:hover{ transform:scale(1.12); background:#FF6B2C; }
+  .sim-range::-webkit-slider-thumb:active{ cursor:grabbing; transform:scale(1.05); }
+  .sim-range::-moz-range-thumb{ width:22px; height:22px; border-radius:9999px; background:#14161A; border:5px solid #F6F5F1; box-shadow:0 3px 12px rgba(20,22,26,.35); cursor:grab; }
+  .sim-range::-moz-range-thumb:hover{ background:#FF6B2C; }
+
+  .preset{ transition:all .3s ease; }
+  .preset:hover{ border-color:#FF6B2C; color:#FF6B2C; transform:translateY(-2px); }
+  .preset.on{ background:#14161A; color:#fff; border-color:#14161A; }
+
+  .alloc-seg{ transition:width .5s cubic-bezier(.22,.9,.24,1); }
+</style>
+</head>
+
+<body class="font-body text-ink">
+
+<!-- ================= HEADER ================= -->
+<header class="fixed top-0 inset-x-0 z-40 bg-paper/85 backdrop-blur-sm border-b border-line">
+  <div class="max-w-[1300px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="h-2 w-2 rounded-full bg-accent breathe"></span>
+      <p class="font-display font-bold text-sm tracking-[0.18em] uppercase">Michael Roman — Growth Plan</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="relative h-9 w-9">
+        <svg class="absolute inset-0" width="36" height="36" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="#E3E1D8" stroke-width="2"/>
+          <circle id="ringFg" cx="18" cy="18" r="15" fill="none" stroke="#FF6B2C" stroke-width="2" stroke-linecap="round"
+                  stroke-dasharray="94.25" stroke-dashoffset="94.25" transform="rotate(-90 18 18)"/>
+        </svg>
+        <span id="slideNum" class="absolute inset-0 flex items-center justify-center font-display font-bold text-[11px]">1</span>
+      </div>
+      <span class="text-[11px] text-muted hidden sm:block">/ <span id="slideTotal">14</span></span>
+      <button id="fsBtn" class="ctl h-9 w-9 rounded-full border border-line flex items-center justify-center text-muted hover:text-ink hover:border-ink/40" aria-label="Fullscreen" title="Fullscreen (F)">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="h-px bg-transparent"><div id="progressBar" class="h-px bg-accent block" style="width:7.14%"></div></div>
+</header>
+
+<!-- ================= SLIDES ================= -->
+<main class="relative w-full h-screen">
+
+  <!-- 1 · TITLE -->
+  <section class="slide active">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto relative">
+        <div class="spin-slower absolute -top-16 -right-10 md:-right-24 h-64 w-64 md:h-96 md:w-96 rounded-full border border-dashed border-line pointer-events-none" aria-hidden="true"></div>
+        <div class="absolute top-10 right-6 md:right-24 h-3 w-3 rounded-full bg-accent breathe pointer-events-none" aria-hidden="true"></div>
+
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s">
+          <span class="h-px w-10 bg-accent"></span> Paid Media Proposal · 2025
+        </p>
+        <h1 class="split font-display font-bold tracking-tight text-5xl md:text-7xl leading-[1.02] mt-8 max-w-3xl">
+          Demand, generated. <em>Intent, captured.</em>
+        </h1>
+        <p class="anim mt-8 text-lg text-muted max-w-xl leading-relaxed" style="--d:.5s">
+          A Google Ads × Meta program for <span class="text-ink font-semibold">Michael Roman</span> — Solar Technical Representative & Freelance Field Engineer, San Diego, CA.
+        </p>
+        <div class="anim mt-10 flex flex-wrap gap-3" style="--d:.62s">
+          <span class="tag border border-line rounded-full px-5 py-2 text-xs font-semibold bg-white">$3,000 / month baseline</span>
+          <span class="tag border border-line rounded-full px-5 py-2 text-xs font-semibold bg-white">8.3× forecast ROAS</span>
+          <span class="tag border border-line rounded-full px-5 py-2 text-xs font-semibold bg-white">6-Stage Sales Funnel</span>
+          <span class="tag border border-line rounded-full px-5 py-2 text-xs font-semibold bg-white">Interactive Budget Simulator</span>
+        </div>
+
+        <div class="anim plain mt-10 max-w-2xl" style="--d:.72s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">In plain words:</span> this deck shows how Google and Facebook ads will bring Michael solar-industry clients — from the first time someone sees an ad to a signed contract — with realistic numbers, an interactive budget slider, and zero jargon left unexplained.</p>
+        </div>
+
+        <p class="anim mt-8 text-[11px] text-muted tracking-wide" style="--d:.8s">
+          Navigate — <span class="border border-line rounded px-2 py-0.5 bg-white">←</span> <span class="border border-line rounded px-2 py-0.5 bg-white">→</span> · swipe on touch · <span class="border border-line rounded px-2 py-0.5 bg-white">F</span> fullscreen · <span class="tip" data-tip="Words with a dotted underline show a simple definition when you hover or tap them." tabindex="0">dotted words = plain definitions</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · CLIENT SNAPSHOT -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 01 · The Client</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Proof behind <em>every ad.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 mt-12">
+          <div class="anim border-r border-line pr-6" style="--d:.2s"><p class="font-display font-bold text-5xl md:text-6xl tracking-tight"><span class="counter" data-target="12">0</span><span class="text-accent">+</span></p><p class="mt-2 text-[11px] tracking-[0.2em] uppercase text-muted">Years in PV</p></div>
+          <div class="anim md:border-r border-line md:px-6" style="--d:.28s"><p class="font-display font-bold text-5xl md:text-6xl tracking-tight"><span class="counter" data-target="140">0</span></p><p class="mt-2 text-[11px] tracking-[0.2em] uppercase text-muted">MWp Commissioned</p></div>
+          <div class="anim border-r border-line pr-6 mt-8 md:mt-0 md:px-6" style="--d:.36s"><p class="font-display font-bold text-5xl md:text-6xl tracking-tight"><span class="counter" data-target="86">0</span></p><p class="mt-2 text-[11px] tracking-[0.2em] uppercase text-muted">Projects Delivered</p></div>
+          <div class="anim md:pl-6 mt-8 md:mt-0" style="--d:.44s"><p class="font-display font-bold text-5xl md:text-6xl tracking-tight"><span class="counter" data-target="32">0</span></p><p class="mt-2 text-[11px] tracking-[0.2em] uppercase text-muted">Repeat Clients</p></div>
+        </div>
+
+        <div class="grid md:grid-cols-[1.2fr_.8fr] gap-8 mt-14">
+          <blockquote class="anim border-l-2 border-accent pl-6" style="--d:.55s">
+            <p class="text-lg md:text-xl leading-relaxed text-ink/85">"Every report I sign is written as if a lender, an insurer and a judge will read it — because someday, one of them might."</p>
+            <footer class="mt-4 text-[11px] tracking-[0.25em] uppercase text-muted">Michael Roman · Core retargeting message</footer>
+          </blockquote>
+          <div class="anim" style="--d:.65s">
+            <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Services to promote</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="tag border border-line bg-white rounded-full px-3.5 py-1.5 text-xs font-semibold">Owner's Engineer</span>
+              <span class="tag border border-line bg-white rounded-full px-3.5 py-1.5 text-xs font-semibold">Commissioning</span>
+              <span class="tag border border-line bg-white rounded-full px-3.5 py-1.5 text-xs font-semibold">QA / QC</span>
+              <span class="tag border border-line bg-white rounded-full px-3.5 py-1.5 text-xs font-semibold">IR Thermography</span>
+              <span class="tag border border-line bg-white rounded-full px-3.5 py-1.5 text-xs font-semibold">Performance Audits</span>
+            </div>
+            <p class="mt-5 text-xs text-muted leading-relaxed"><span class="tip" data-tip="The average amount one signed project pays. We use this to predict how much ad spend turns into income." tabindex="0">Avg. contract value</span>: <span class="text-ink font-semibold">$8k – $25k</span> · forecast uses <span class="text-ink font-semibold">$12.5k</span>.</p>
+          </div>
+        </div>
+
+        <div class="anim plain mt-10" style="--d:.75s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Why this page matters:</span> ads work best when they show real proof. Numbers like "140 MWp commissioned" are the hooks inside every ad — they make engineering firms trust Michael enough to click, inquire, and eventually sign.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · MARKET REALITY -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 02 · Market Reality</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Why it works <em>in this area.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
+          <div class="anim m-card bg-white border border-line rounded-2xl p-6" style="--d:.2s">
+            <p class="font-display text-xs text-muted">01</p>
+            <h3 class="font-display font-bold text-lg mt-3">#1 Solar State</h3>
+            <p class="mt-2 text-sm text-muted leading-relaxed">California leads US installed PV. The San Diego–Imperial corridor holds an active utility + storage pipeline needing commissioning & QA.</p>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-6" style="--d:.28s">
+            <p class="font-display text-xs text-muted">02</p>
+            <h3 class="font-display font-bold text-lg mt-3"><span class="tip" data-tip="California's 2023 solar billing rule. It made home solar less profitable, so the industry shifted money into business-scale solar and batteries — Michael's exact niche." tabindex="0">NEM 3.0</span> Shift</h3>
+            <p class="mt-2 text-sm text-muted leading-relaxed">Residential retreat pushed CA capital into <span class="tip" data-tip="Commercial & Industrial — solar on businesses, warehouses and factories, not homes." tabindex="0">C&I</span> + storage — exactly where independent engineers get hired.</p>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-6" style="--d:.36s">
+            <p class="font-display text-xs text-muted">03</p>
+            <h3 class="font-display font-bold text-lg mt-3">Auction Gap</h3>
+            <p class="mt-2 text-sm text-muted leading-relaxed">B2B engineering keywords cost <span class="tip" data-tip="Cost Per Click — what we pay each time someone taps the ad. Lower = more visitors for the same money." tabindex="0">$3–$7 CPC</span> while consumer "solar installer" terms run $20+.</p>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-6" style="--d:.44s">
+            <p class="font-display text-xs text-muted">04</p>
+            <h3 class="font-display font-bold text-lg mt-3">Geo Strategy</h3>
+            <p class="mt-2 text-sm text-muted leading-relaxed">San Diego + 50 mi for C&I site work; state-level reach for utility:</p>
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              <span class="border border-line rounded-full px-2.5 py-1 text-[10px] font-semibold">CA</span>
+              <span class="border border-line rounded-full px-2.5 py-1 text-[10px] font-semibold">TX</span>
+              <span class="border border-line rounded-full px-2.5 py-1 text-[10px] font-semibold">AZ</span>
+              <span class="border border-line rounded-full px-2.5 py-1 text-[10px] font-semibold">NV</span>
+              <span class="border border-line rounded-full px-2.5 py-1 text-[10px] font-semibold">FL</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="anim marquee border-y border-line mt-10 py-3.5" style="--d:.55s">
+          <div class="marquee-track text-[11px] tracking-[0.35em] uppercase text-muted font-semibold">
+            <span class="px-5">San Diego <span class="text-accent">●</span></span><span class="px-5">Imperial Valley <span class="text-accent">●</span></span><span class="px-5">Phoenix <span class="text-accent">●</span></span><span class="px-5">Las Vegas <span class="text-accent">●</span></span><span class="px-5">Austin <span class="text-accent">●</span></span><span class="px-5">Dallas <span class="text-accent">●</span></span><span class="px-5">Sacramento <span class="text-accent">●</span></span><span class="px-5">Bakersfield <span class="text-accent">●</span></span>
+            <span class="px-5">San Diego <span class="text-accent">●</span></span><span class="px-5">Imperial Valley <span class="text-accent">●</span></span><span class="px-5">Phoenix <span class="text-accent">●</span></span><span class="px-5">Las Vegas <span class="text-accent">●</span></span><span class="px-5">Austin <span class="text-accent">●</span></span><span class="px-5">Dallas <span class="text-accent">●</span></span><span class="px-5">Sacramento <span class="text-accent">●</span></span><span class="px-5">Bakersfield <span class="text-accent">●</span></span>
+          </div>
+        </div>
+        <p class="anim mt-6 text-sm text-muted" style="--d:.65s"><span class="text-ink font-semibold">Buyer personas — the exact people our ads target:</span> EPC project directors · renewable asset managers · solar developers · inverter & module manufacturers needing field reps.</p>
+
+        <div class="anim plain mt-6" style="--d:.75s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Simple version:</span> the Southwest is building solar aggressively, and almost nobody advertises engineering services there. Lots of buyers, very few competitors → our ads reach the right people at a discount.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · CHANNEL STRATEGY -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 03 · Channel Strategy</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Two engines, <em>one funnel.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid md:grid-cols-2 gap-5 mt-12">
+          <div class="anim m-card bg-white border border-line rounded-2xl p-8" style="--d:.2s">
+            <div class="flex items-center justify-between">
+              <span class="font-display font-bold text-6xl text-ink">G</span>
+              <span class="tip text-[10px] font-bold tracking-[0.25em] uppercase border border-ink rounded-full px-3.5 py-1.5" data-tip="Catching people at the exact moment they type a search like 'solar commissioning engineer' — they already want the service." tabindex="0">Demand Capture</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl mt-6">Google Ads</h3>
+            <ul class="mt-4 space-y-3 text-sm text-muted">
+              <li class="flex gap-3"><span class="text-accent mt-0.5">→</span> Intercepts buyers already searching "solar commissioning engineer" or "owner's engineer PV".</li>
+              <li class="flex gap-3"><span class="text-accent mt-0.5">→</span> Niche volume: ≈ 2,000–3,500 US searches / month across target terms.</li>
+              <li class="flex gap-3"><span class="text-accent mt-0.5">→</span> Exact-match keeps CPC near $4.50 — away from the $20+ consumer auction.</li>
+            </ul>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-8" style="--d:.3s">
+            <div class="flex items-center justify-between">
+              <span class="font-display font-bold text-6xl text-accent">M</span>
+              <span class="tip text-[10px] font-bold tracking-[0.25em] uppercase border border-accent text-accent rounded-full px-3.5 py-1.5" data-tip="Introducing Michael to decision-makers before they ever search — building awareness so they recognize the name later." tabindex="0">Demand Generation</span>
+            </div>
+            <h3 class="font-display font-bold text-2xl mt-6">Meta Ads</h3>
+            <ul class="mt-4 space-y-3 text-sm text-muted">
+              <li class="flex gap-3"><span class="text-accent mt-0.5">→</span> Reaches decision-makers before they search — thermal imagery stops the scroll.</li>
+              <li class="flex gap-3"><span class="text-accent mt-0.5">→</span> Regional CPMs $12–$15 build a retargeting pool of EPC & investor profiles.</li>
+              <li class="flex gap-3"><span class="text-accent mt-0.5">→</span> Native lead forms auto-fill business data → up to 40% higher conversion.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="anim bg-white border border-line rounded-2xl mt-6 p-6" style="--d:.42s">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
+            <div class="flex-1"><p class="font-display font-bold">Meta TOFU</p><p class="text-[11px] text-muted mt-1">Proof of work</p></div>
+            <span class="nudge text-accent hidden md:block">→</span><span class="nudge text-accent md:hidden">↓</span>
+            <div class="flex-1"><p class="font-display font-bold">Meta Retargeting</p><p class="text-[11px] text-muted mt-1">Builds search behavior</p></div>
+            <span class="nudge text-accent hidden md:block" style="animation-delay:.3s">→</span><span class="nudge text-accent md:hidden">↓</span>
+            <div class="flex-1"><p class="font-display font-bold">Google Search</p><p class="text-[11px] text-muted mt-1">Captures the raised hand</p></div>
+            <span class="nudge text-accent hidden md:block" style="animation-delay:.6s">→</span><span class="nudge text-accent md:hidden">↓</span>
+            <div class="flex-1"><p class="font-display font-bold">Contract</p><p class="text-[11px] text-muted mt-1">Avg. $12.5k</p></div>
+          </div>
+        </div>
+
+        <div class="anim plain mt-6" style="--d:.55s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Think of it like this:</span> Meta (Facebook/Instagram) introduces Michael to people who don't know him yet. Google is waiting when those same people later search for help. Together they cover the entire buyer journey — nobody falls through the gap.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · SALES FUNNEL -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 04 · Sales Funnel</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">The customer journey, <em>stage by stage.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="mt-12 max-w-3xl mx-auto">
+          <div class="anim mx-auto" style="--d:.15s">
+            <div class="sfbar bg-ink text-white rounded-xl h-14 flex items-center justify-between px-5 min-w-[280px]" style="--w:100%;--d:.2s">
+              <div><p class="text-[10px] tracking-[0.22em] uppercase opacity-70">Awareness — they see us</p><p class="font-display font-bold text-sm">Meta TOFU + Google Display</p></div>
+              <p class="font-display font-bold text-lg">161,000</p>
+            </div>
+          </div>
+          <p class="anim text-center text-[10px] text-muted py-1.5 tracking-wide" style="--d:.25s">↓ 1.0% tap the ad to learn more</p>
+          <div class="anim mx-auto" style="--d:.25s">
+            <div class="sfbar bg-accent text-white rounded-xl h-14 flex items-center justify-between px-5 min-w-[280px] mx-auto" style="--w:86%;--d:.32s">
+              <div><p class="text-[10px] tracking-[0.22em] uppercase opacity-75">Interest — they engage</p><p class="font-display font-bold text-sm">Site visits + video views</p></div>
+              <p class="font-display font-bold text-lg">1,658</p>
+            </div>
+          </div>
+          <p class="anim text-center text-[10px] text-muted py-1.5 tracking-wide" style="--d:.38s">↓ 3.0% leave their contact details</p>
+          <div class="anim mx-auto" style="--d:.35s">
+            <div class="sfbar rounded-xl h-14 flex items-center justify-between px-5 min-w-[280px] mx-auto text-white" style="--w:70%;--d:.44s;background:#FF8B57">
+              <div><p class="text-[10px] tracking-[0.22em] uppercase opacity-75">Lead — they inquire</p><p class="font-display font-bold text-sm">Lead forms + landing pages</p></div>
+              <p class="font-display font-bold text-lg">49</p>
+            </div>
+          </div>
+          <p class="anim text-center text-[10px] text-muted py-1.5 tracking-wide" style="--d:.5s">↓ 40% are real solar projects (screened)</p>
+          <div class="anim mx-auto" style="--d:.45s">
+            <div class="sfbar rounded-xl h-14 flex items-center justify-between px-5 min-w-[280px] mx-auto text-white" style="--w:54%;--d:.56s;background:#FFA37A">
+              <div><p class="text-[10px] tracking-[0.22em] uppercase opacity-75">Qualified — worth a call</p><p class="font-display font-bold text-sm">24h response + needs audit</p></div>
+              <p class="font-display font-bold text-lg">20 MQL</p>
+            </div>
+          </div>
+          <p class="anim text-center text-[10px] text-muted py-1.5 tracking-wide" style="--d:.62s">↓ 45% agree to a meeting</p>
+          <div class="anim mx-auto" style="--d:.55s">
+            <div class="sfbar rounded-xl h-14 flex items-center justify-between px-5 min-w-[280px] mx-auto" style="--w:38%;--d:.68s;background:#E3E1D8">
+              <div><p class="text-[10px] tracking-[0.22em] uppercase text-muted">Proposal — we pitch scope</p><p class="font-display font-bold text-sm text-ink">Discovery call + quote</p></div>
+              <p class="font-display font-bold text-lg text-ink">9</p>
+            </div>
+          </div>
+          <p class="anim text-center text-[10px] text-muted py-1.5 tracking-wide" style="--d:.74s">↓ 25% say yes</p>
+          <div class="anim mx-auto" style="--d:.65s">
+            <div class="sfbar rounded-xl h-14 flex items-center justify-between px-5 min-w-[280px] mx-auto border-2 border-accent bg-white" style="--w:26%;--d:.8s">
+              <div><p class="text-[10px] tracking-[0.22em] uppercase text-accent">Contract — paid work</p><p class="font-display font-bold text-sm text-ink">Signed scope of work</p></div>
+              <p class="font-display font-bold text-lg text-accent">≈ 2 / mo</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="anim plain mt-10 max-w-3xl mx-auto" style="--d:.85s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">What is a funnel?</span> Many people see the ads; fewer click; fewer still become clients. That shrinking shape is normal and healthy. Each step shows where people drop off — and which campaign plus follow-up action moves them forward. Every stage here is owned by a piece of this plan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · META FUNNEL -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 05 · Meta Funnel</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Demand gen at <em>$1,500 / mo.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-12 mt-12">
+          <div class="space-y-7">
+            <div class="anim" style="--d:.2s">
+              <div class="flex items-baseline justify-between mb-2"><span class="tip text-[11px] tracking-[0.22em] uppercase text-muted" data-tip="How many times our ads appeared on screens. One person can generate several impressions." tabindex="0">Impressions</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="105000">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-accent/90" style="--w:100%;--fd:.3s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Ad views · costs ≈ $14.3 per 1,000 views</p>
+            </div>
+            <div class="anim" style="--d:.3s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Clicks — people who tapped</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="1150">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-accent/70" style="--w:74%;--fd:.45s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5"><span class="tip" data-tip="Click-Through Rate — out of everyone who saw the ad, the % who tapped it. 1%+ is solid for B2B." tabindex="0">CTR</span> 1.1% — about 1 in 90 viewers taps</p>
+            </div>
+            <div class="anim" style="--d:.4s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Leads — shared contact info</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="30">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-accent/55" style="--w:50%;--fd:.6s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Each lead costs ≈ $50 (<span class="tip" data-tip="Cost Per Lead — total ad spend ÷ number of inquiries received." tabindex="0">CPL</span>)</p>
+            </div>
+            <div class="anim" style="--d:.5s">
+              <div class="flex items-baseline justify-between mb-2"><span class="tip text-[11px] tracking-[0.22em] uppercase text-muted" data-tip="Marketing Qualified Lead — a lead that passed our screening (real project size, real company) and is worth calling." tabindex="0">Qualified — MQL</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="12">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-accent/40" style="--w:33%;--fd:.75s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">40% pass the "what's your project size?" screen</p>
+            </div>
+            <div class="anim" style="--d:.6s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Meetings — booked calls</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="5">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-accent/25" style="--w:20%;--fd:.9s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Nearly half of qualified leads agree to talk</p>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <div class="anim bg-white border border-line rounded-2xl p-6" style="--d:.4s">
+              <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Architecture</p>
+              <div class="mt-4 space-y-3 text-sm">
+                <div class="flex justify-between"><span class="text-muted">① <span class="tip" data-tip="Top Of Funnel — ads for cold audiences who've never heard of Michael. Goal: visibility." tabindex="0">TOFU</span> — Authority</span><span class="font-semibold">$150 · 10%</span></div>
+                <div class="flex justify-between"><span class="text-muted">② <span class="tip" data-tip="Middle Of Funnel — ads that collect inquiries from people who showed interest." tabindex="0">MOFU</span> — Lead Ads</span><span class="font-semibold text-accent">$1,050 · 70%</span></div>
+                <div class="flex justify-between"><span class="text-muted">③ <span class="tip" data-tip="Bottom Of Funnel — ads shown only to people who already visited the site or watched a video." tabindex="0">BOFU</span> — Retargeting</span><span class="font-semibold">$300 · 20%</span></div>
+              </div>
+            </div>
+            <div class="anim border-l-2 border-accent pl-5" style="--d:.52s">
+              <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Area assumptions</p>
+              <p class="mt-2 text-sm text-muted leading-relaxed">Southwest B2B audiences cost $12–$15 per 1,000 ad views vs $25+ on coastal finance audiences — our regional advantage.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="anim plain mt-8" style="--d:.7s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Reading this page:</span> for $1,500 a month, roughly 105,000 screens show Michael's ads, 30 people leave their details, and 5 book calls. Every row is smaller than the one above — that's a healthy funnel, not a problem.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · META BUDGET -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 05 · Meta Budget</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">$1,500 — <em>70 / 20 / 10.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid lg:grid-cols-[.7fr_1.3fr] gap-12 mt-12 items-center">
+          <div class="anim flex justify-center" style="--d:.2s">
+            <div class="relative">
+              <svg width="250" height="250" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#EDEBE3" stroke-width="13"/>
+                <circle class="donut-seg seg-1" cx="100" cy="100" r="80" stroke="#FF6B2C" transform="rotate(-90 100 100)" stroke-linecap="round"/>
+                <circle class="donut-seg seg-2" cx="100" cy="100" r="80" stroke="#14161A" transform="rotate(162 100 100)" stroke-linecap="round"/>
+                <circle class="donut-seg seg-3" cx="100" cy="100" r="80" stroke="#C9C6BC" transform="rotate(234 100 100)" stroke-linecap="round"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <p class="font-display font-bold text-3xl">$1,500</p>
+                <p class="text-[10px] tracking-[0.25em] uppercase text-muted mt-1">Monthly · Meta</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="anim bg-white border border-line rounded-2xl overflow-hidden" style="--d:.35s">
+            <table class="tbl">
+              <thead><tr><th>Campaign</th><th>Budget</th><th>Benchmark</th><th>Output</th></tr></thead>
+              <tbody>
+                <tr><td><span class="text-ink font-semibold">② MOFU Lead Ads</span><br><span class="text-xs text-muted">IR audit pain-point</span></td><td class="num">$1,050 · 70%</td><td>CPL $42</td><td class="num">25 leads</td></tr>
+                <tr><td><span class="text-ink font-semibold">③ BOFU Retargeting</span><br><span class="text-xs text-muted">Visitors + video viewers</span></td><td class="num">$300 · 20%</td><td>CPL $60</td><td class="num">5 leads</td></tr>
+                <tr><td><span class="text-ink font-semibold">① TOFU Awareness</span><br><span class="text-xs text-muted">$5/day evergreen</span></td><td class="num">$150 · 10%</td><td>CPM $12</td><td class="num">12.5k ad views</td></tr>
+              </tbody>
+              <tfoot><tr><td class="num">Meta Total</td><td class="num">$1,500</td><td class="num">CPL ≈ $50</td><td class="num">30 leads</td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="anim plain mt-8" style="--d:.5s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Why 70/20/10:</span> most money goes where inquiries actually come in (70%). A fifth follows warm visitors until they convert (20%). A small always-on drip keeps showing Michael to fresh faces (10%) — so next month's funnel never runs empty. Every form also asks project size first, so no time is wasted on home-owner inquiries.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · GOOGLE FUNNEL -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 06 · Google Funnel</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Demand capture at <em>$1,500 / mo.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-12 mt-12">
+          <div class="space-y-7">
+            <div class="anim" style="--d:.2s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Impressions — times shown in results</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="56000">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-ink/90" style="--w:100%;--fd:.3s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Search results + display banners combined</p>
+            </div>
+            <div class="anim" style="--d:.3s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Clicks — visitors to the site</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="508">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-ink/70" style="--w:72%;--fd:.45s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Average $2.95 paid per visitor</p>
+            </div>
+            <div class="anim" style="--d:.4s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Leads — inquiry forms sent</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="19">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-ink/50" style="--w:48%;--fd:.6s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">≈ $79 per inquiry — pricier, but higher intent</p>
+            </div>
+            <div class="anim" style="--d:.5s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Qualified — real project needs</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="8">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-ink/35" style="--w:32%;--fd:.75s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Searchers self-select: they already want the service</p>
+            </div>
+            <div class="anim" style="--d:.6s">
+              <div class="flex items-baseline justify-between mb-2"><span class="text-[11px] tracking-[0.22em] uppercase text-muted">Meetings — booked calls</span><span class="font-display font-bold text-2xl md:text-3xl"><span class="counter" data-target="4">0</span></span></div>
+              <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div class="ffill bg-ink/20" style="--w:20%;--fd:.9s"></div></div>
+              <p class="text-[10px] text-muted mt-1.5">Search leads close faster — shorter sales cycle</p>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <div class="anim bg-white border border-line rounded-2xl p-6" style="--d:.4s">
+              <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Keyword map — what we bid on</p>
+              <div class="mt-4 space-y-4 text-xs">
+                <div><p class="font-semibold">A · Commissioning & QA</p><p class="text-muted mt-1 leading-relaxed">"solar commissioning engineer" · "PV commissioning services" · "IEC 62446 testing"</p></div>
+                <div><p class="font-semibold">B · Owner's Engineer</p><p class="text-muted mt-1 leading-relaxed">"owner's engineer solar" · "solar technical due diligence"</p></div>
+                <div><p class="font-semibold">C · Diagnostics</p><p class="text-muted mt-1 leading-relaxed">"solar thermal imaging inspection" · "IV curve tracing" · "performance audit"</p></div>
+              </div>
+            </div>
+            <div class="anim border-l-2 border-ink pl-5" style="--d:.52s">
+              <p class="tip text-[11px] tracking-[0.25em] uppercase text-muted" data-tip="Words we block so our ads never show for them — e.g. 'jobs' or 'free'. Saves money instantly." tabindex="0">Negative keywords</p>
+              <p class="mt-2 text-sm text-muted leading-relaxed">residential · DIY · training · course · jobs · salary · free · cheap — added week 1 so we never pay for junk clicks.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="anim plain mt-8" style="--d:.7s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Reading this page:</span> these are people typing "solar commissioning engineer" into Google right now — they already want what Michael sells. Fewer leads than Meta, but they buy faster, which is why they're worth a higher price per inquiry.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · GOOGLE BUDGET -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 06 · Google Budget</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">$1,500 — <em>capture first.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="anim mt-12" style="--d:.2s">
+          <div class="flex h-14 rounded-2xl overflow-hidden border border-line bg-white">
+            <div class="bseg text-white" style="--w:70%;--bd:.3s;background:#14161A">Search · $1,050 · 70%</div>
+            <div class="bseg text-white" style="--w:20%;--bd:.7s;background:#FF6B2C">Display · $300</div>
+            <div class="bseg text-ink" style="--w:10%;--bd:1s;background:#E3E1D8">Brand $150</div>
+          </div>
+        </div>
+
+        <div class="anim bg-white border border-line rounded-2xl overflow-hidden mt-8" style="--d:.4s">
+          <table class="tbl">
+            <thead><tr><th>Campaign</th><th>Budget</th><th>Benchmark</th><th>Output</th></tr></thead>
+            <tbody>
+              <tr><td><span class="text-ink font-semibold">Search — exact / phrase</span><br><span class="text-xs text-muted">Campaigns A · B · C, Southwest geo</span></td><td class="num">$1,050 · 70%</td><td>CPC $4.50 · CVR 5%</td><td class="num">233 clicks → 12 leads</td></tr>
+              <tr><td><span class="text-ink font-semibold">Display + <span class="tip" data-tip="Performance Max — Google's automated campaign type that extends retargeting across YouTube, Gmail and millions of sites." tabindex="0">PMax</span></span><br><span class="text-xs text-muted">Follows past website visitors</span></td><td class="num">$300 · 20%</td><td>CPM $6 · CPL $75</td><td class="num">50k views → 4 leads</td></tr>
+              <tr><td><span class="text-ink font-semibold"><span class="tip" data-tip="Bidding on Michael's own name so nobody else can hijack searches for 'Michael Roman solar'." tabindex="0">Brand protection</span></span><br><span class="text-xs text-muted">"Michael Roman solar" terms</span></td><td class="num">$150 · 10%</td><td>CPC $1.20</td><td class="num">125 clicks → 3 leads</td></tr>
+            </tbody>
+            <tfoot><tr><td class="num">Google Total</td><td class="num">$1,500</td><td class="num">CPL ≈ $79</td><td class="num">19 leads</td></tr></tfoot>
+          </table>
+        </div>
+
+        <div class="anim plain mt-8" style="--d:.55s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Why this split:</span> 70% catches people actively searching (the hottest buyers). 20% quietly follows people who visited the site but left — cheap second chances. 10% guarantees that anyone searching Michael's name lands on him, not a competitor. "CVR" in the table means the % of visitors who fill the inquiry form.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · COMBINED FORECAST -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 07 · Combined Forecast</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">One funnel, <em>two channels.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="anim bg-white border border-line rounded-2xl overflow-hidden mt-12" style="--d:.2s">
+          <table class="tbl">
+            <thead><tr><th>Stage</th><th>Meta</th><th>Google</th><th>Combined</th></tr></thead>
+            <tbody>
+              <tr><td>Impressions <span class="text-xs text-muted">— ad views</span></td><td class="num">105,000</td><td class="num">56,000</td><td class="num">161,000</td></tr>
+              <tr><td>Clicks <span class="text-xs text-muted">— site visitors</span></td><td class="num">1,150</td><td class="num">508</td><td class="num">1,658</td></tr>
+              <tr><td>Leads <span class="text-xs text-muted">— inquiries</span></td><td class="num">30</td><td class="num">19</td><td class="num">49</td></tr>
+              <tr><td>Qualified <span class="text-xs text-muted">— real projects</span></td><td class="num">12</td><td class="num">8</td><td class="num">20</td></tr>
+              <tr><td>Meetings <span class="text-xs text-muted">— booked calls</span></td><td class="num">5</td><td class="num">4</td><td class="num">9</td></tr>
+              <tr><td>New clients <span class="text-xs text-muted">— signed work</span></td><td class="num">1–2</td><td class="num">1</td><td class="num">≈ 2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6 mt-10">
+          <div class="anim text-center" style="--d:.35s">
+            <span class="mask"><span class="mask-inner font-display font-bold text-3xl md:text-5xl tracking-tight" style="--d:.45s">$<span class="counter" data-target="25000">0</span></span></span>
+            <p class="mt-2 text-[10px] tracking-[0.22em] uppercase text-muted">New project revenue / mo</p>
+          </div>
+          <div class="anim text-center" style="--d:.42s">
+            <span class="mask"><span class="mask-inner font-display font-bold text-3xl md:text-5xl tracking-tight text-accent" style="--d:.55s"><span class="counter" data-target="8.3" data-decimals="1">0</span>×</span></span>
+            <p class="mt-2 text-[10px] tracking-[0.22em] uppercase text-muted"><span class="tip" data-tip="Return On Ad Spend — every $1 of ads is forecast to bring back $8.30 in project revenue." tabindex="0">ROAS</span> — return per $1</p>
+          </div>
+          <div class="anim text-center" style="--d:.49s">
+            <span class="mask"><span class="mask-inner font-display font-bold text-3xl md:text-5xl tracking-tight" style="--d:.65s">$<span class="counter" data-target="61">0</span></span></span>
+            <p class="mt-2 text-[10px] tracking-[0.22em] uppercase text-muted">Cost per inquiry, blended</p>
+          </div>
+        </div>
+
+        <div class="anim plain mt-10" style="--d:.75s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">The headline:</span> about $3,000 of ads buys ≈ 49 conversations a month, and roughly 2 of them become paid projects worth ≈ $25,000. We modeled a conservative 25% closing rate and a slow first month — real results can beat this, they shouldn't fall far below it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · BUDGET SIMULATOR -->
+  <section class="slide" id="simSlide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-6xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 08 · Budget Simulator</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Drag the budget. <em>Watch the output.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid lg:grid-cols-[.95fr_1.05fr] gap-8 mt-10">
+          <!-- CONTROLS -->
+          <div class="anim bg-white border border-line rounded-2xl p-7" style="--d:.2s">
+            <div class="flex items-baseline justify-between">
+              <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Total monthly budget</p>
+              <p class="font-display font-bold text-3xl">$<span id="simBudgetVal">3,000</span></p>
+            </div>
+            <input id="budgetRange" type="range" min="1000" max="8000" step="250" value="3000" class="sim-range mt-5" aria-label="Total monthly budget">
+            <div class="flex justify-between text-[10px] text-muted mt-2 font-semibold">
+              <span>$1k</span><span>$2k</span><span>$3k</span><span>$4k</span><span>$5k</span><span>$6k</span><span>$7k</span><span>$8k</span>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <button class="preset border border-line rounded-full px-4 py-1.5 text-xs font-semibold" data-val="1500">$1,500</button>
+              <button class="preset border border-line rounded-full px-4 py-1.5 text-xs font-semibold on" data-val="3000">$3,000</button>
+              <button class="preset border border-line rounded-full px-4 py-1.5 text-xs font-semibold" data-val="4500">$4,500</button>
+              <button class="preset border border-line rounded-full px-4 py-1.5 text-xs font-semibold" data-val="6000">$6,000</button>
+            </div>
+
+            <div class="h-px bg-line my-6"></div>
+
+            <div class="flex items-baseline justify-between">
+              <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Channel split</p>
+              <p class="text-sm font-semibold"><span class="text-accent">Meta <span id="simMetaPct">50</span>%</span> · <span>Google <span id="simGooglePct">50</span>%</span></p>
+            </div>
+            <input id="splitRange" type="range" min="20" max="80" step="5" value="50" class="sim-range mt-5" aria-label="Meta share of budget">
+            <div class="flex justify-between text-[10px] text-muted mt-2 font-semibold"><span>Google-heavy</span><span>Balanced</span><span>Meta-heavy</span></div>
+
+            <div class="flex h-10 rounded-xl overflow-hidden border border-line mt-5">
+              <div id="allocMeta" class="alloc-seg bg-accent text-white flex items-center justify-center text-xs font-bold" style="width:50%"><span id="allocMetaVal">$1,500</span></div>
+              <div id="allocGoogle" class="alloc-seg bg-ink text-white flex items-center justify-center text-xs font-bold" style="width:50%"><span id="allocGoogleVal">$1,500</span></div>
+            </div>
+            <p class="text-[10px] text-muted mt-3 leading-relaxed">Inside each channel the money keeps the proven ratios — Meta 70/20/10 · Google 70/20/10.</p>
+          </div>
+
+          <!-- OUTPUT -->
+          <div class="anim bg-white border border-line rounded-2xl p-7" style="--d:.32s">
+            <p class="text-[11px] tracking-[0.25em] uppercase text-muted">Projected monthly output — updates live</p>
+
+            <div class="mt-5 space-y-4">
+              <div>
+                <div class="flex items-baseline justify-between mb-1.5"><span class="text-[10px] tracking-[0.2em] uppercase text-muted">Impressions — ad views</span><span class="font-display font-bold text-xl" id="oImp">0</span></div>
+                <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div id="oImpBar" class="h-full rounded-full bg-ink/85" style="width:0%;transition:width .6s cubic-bezier(.22,.9,.24,1)"></div></div>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between mb-1.5"><span class="text-[10px] tracking-[0.2em] uppercase text-muted">Clicks — visitors</span><span class="font-display font-bold text-xl" id="oClick">0</span></div>
+                <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div id="oClickBar" class="h-full rounded-full bg-ink/65" style="width:0%;transition:width .6s cubic-bezier(.22,.9,.24,1)"></div></div>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between mb-1.5"><span class="text-[10px] tracking-[0.2em] uppercase text-muted">Leads — inquiries</span><span class="font-display font-bold text-xl" id="oLead">0</span></div>
+                <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div id="oLeadBar" class="h-full rounded-full bg-accent" style="width:0%;transition:width .6s cubic-bezier(.22,.9,.24,1)"></div></div>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between mb-1.5"><span class="text-[10px] tracking-[0.2em] uppercase text-muted">Qualified — real projects</span><span class="font-display font-bold text-xl" id="oMql">0</span></div>
+                <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div id="oMqlBar" class="h-full rounded-full bg-accent/70" style="width:0%;transition:width .6s cubic-bezier(.22,.9,.24,1)"></div></div>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between mb-1.5"><span class="text-[10px] tracking-[0.2em] uppercase text-muted">Meetings — booked calls</span><span class="font-display font-bold text-xl" id="oMeet">0</span></div>
+                <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div id="oMeetBar" class="h-full rounded-full bg-accent/50" style="width:0%;transition:width .6s cubic-bezier(.22,.9,.24,1)"></div></div>
+              </div>
+              <div>
+                <div class="flex items-baseline justify-between mb-1.5"><span class="text-[10px] tracking-[0.2em] uppercase text-muted">New clients — signed work</span><span class="font-display font-bold text-xl text-accent" id="oClient">0</span></div>
+                <div class="h-1.5 rounded-full bg-line/70 overflow-hidden"><div id="oClientBar" class="h-full rounded-full bg-accent/35" style="width:0%;transition:width .6s cubic-bezier(.22,.9,.24,1)"></div></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-line text-center">
+              <div><p class="font-display font-bold text-lg md:text-xl" id="kCpl">$0</p><p class="text-[9px] tracking-[0.18em] uppercase text-muted mt-1">Cost / inquiry</p></div>
+              <div><p class="font-display font-bold text-lg md:text-xl" id="kRev">$0</p><p class="text-[9px] tracking-[0.18em] uppercase text-muted mt-1">Revenue / mo</p></div>
+              <div><p class="font-display font-bold text-lg md:text-xl text-accent" id="kRoas">0×</p><p class="text-[9px] tracking-[0.18em] uppercase text-muted mt-1">Return per $1</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="anim plain mt-6" style="--d:.45s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">How to use this:</span> drag the top scrollbar to set how much we spend, drag the bottom one to decide how it's divided between Facebook and Google. The forecast on the right recalculates instantly using the same real-world rates shown on the previous slides — try $6,000 to see what scaling looks like.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · KPI BENCHMARKS -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 09 · KPI Benchmarks</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">Realistic targets, <em>by channel.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid md:grid-cols-2 gap-5 mt-12">
+          <div class="anim m-card bg-white border border-line rounded-2xl p-8" style="--d:.2s">
+            <div class="flex items-center justify-between">
+              <span class="font-display font-bold text-4xl text-accent">M</span>
+              <p class="text-[10px] font-bold tracking-[0.25em] uppercase text-muted">Meta Ads</p>
+            </div>
+            <div class="mt-6 text-sm">
+              <div class="flex justify-between py-3 border-b border-line"><span class="tip text-muted" data-tip="Cost per 1,000 ad views — how expensive it is to be seen." tabindex="0">CPM — cost per 1,000 views</span><span class="font-semibold">$12 – $15</span></div>
+              <div class="flex justify-between py-3 border-b border-line"><span class="tip text-muted" data-tip="Click-through rate — % of viewers who tap the ad." tabindex="0">CTR — taps per viewer</span><span class="font-semibold">≥ 1.0%</span></div>
+              <div class="flex justify-between py-3 border-b border-line"><span class="tip text-muted" data-tip="Conversion rate — % of clickers who fill the inquiry form." tabindex="0">Form conversion</span><span class="font-semibold">≥ 2.5%</span></div>
+              <div class="flex justify-between py-3 border-b border-line"><span class="text-muted">Cost / inquiry</span><span class="font-semibold text-accent">≤ $55</span></div>
+              <div class="flex justify-between py-3"><span class="tip text-muted" data-tip="How many times the same person sees the ad per week. Above 3 = annoying, so we cap it." tabindex="0">Frequency cap — repeat views</span><span class="font-semibold">&lt; 3.0 / week</span></div>
+            </div>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-8" style="--d:.3s">
+            <div class="flex items-center justify-between">
+              <span class="font-display font-bold text-4xl">G</span>
+              <p class="text-[10px] font-bold tracking-[0.25em] uppercase text-muted">Google Ads</p>
+            </div>
+            <div class="mt-6 text-sm">
+              <div class="flex justify-between py-3 border-b border-line"><span class="text-muted">Cost per click</span><span class="font-semibold">$4.00 – $5.00</span></div>
+              <div class="flex justify-between py-3 border-b border-line"><span class="text-muted">Click rate on search</span><span class="font-semibold">≥ 4.0%</span></div>
+              <div class="flex justify-between py-3 border-b border-line"><span class="text-muted">Visitors → inquiries</span><span class="font-semibold">≥ 4.5%</span></div>
+              <div class="flex justify-between py-3 border-b border-line"><span class="text-muted">Cost / inquiry</span><span class="font-semibold text-accent">≤ $95</span></div>
+              <div class="flex justify-between py-3"><span class="tip text-muted" data-tip="Google's 1–10 rating of ad relevance. Higher score = cheaper clicks for the same position." tabindex="0">Quality Score — Google's rating</span><span class="font-semibold">≥ 7 / 10</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="anim border-l-2 border-accent pl-6 mt-8" style="--d:.45s">
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Pipeline rules (both channels):</span> ≥ 40% of leads must be real projects · ≥ 45% of those book calls · ≥ 25% of calls close · reply within 24 hours — the single biggest lever on closing freelance deals.</p>
+        </div>
+
+        <div class="anim plain mt-6" style="--d:.55s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">What these numbers are for:</span> they're the "healthy vital signs" of the campaigns. We check them weekly — if any metric drifts outside its range, we fix the ads before spending more. No surprises, no silent budget leaks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · ROADMAP -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 10 · Roadmap</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5"><em>$3,000 / month,</em> phased to scale.</h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="anim mt-12" style="--d:.2s">
+          <div class="flex h-14 rounded-2xl overflow-hidden border border-line bg-white">
+            <div class="bseg text-white" style="--w:50%;--bd:.3s;background:#FF6B2C">Meta · $1,500 · 50%</div>
+            <div class="bseg text-white" style="--w:50%;--bd:.65s;background:#14161A">Google · $1,500 · 50%</div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-5 mt-8">
+          <div class="anim m-card bg-white border border-line rounded-2xl p-7" style="--d:.35s">
+            <p class="text-[10px] font-bold tracking-[0.3em] uppercase text-muted">Month 1 · Learning</p>
+            <p class="font-display font-bold text-3xl mt-3">$3,000</p>
+            <p class="mt-3 text-sm text-muted leading-relaxed">Full split active. Expect 60–70% of forecast while the platforms collect data. No budget changes — protect the <span class="tip" data-tip="The first ~50 conversions, when Google/Meta figure out who converts best. Changing budgets mid-way resets it." tabindex="0">learning phase</span>.</p>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-7" style="--d:.45s">
+            <p class="text-[10px] font-bold tracking-[0.3em] uppercase text-muted">Months 2–3 · Optimization</p>
+            <p class="font-display font-bold text-3xl mt-3">$3,000</p>
+            <p class="mt-3 text-sm text-muted leading-relaxed">Switch off anything paying 1.5× too much per lead. Fresh creatives every 3 weeks. Shift money toward the best-performing states.</p>
+          </div>
+          <div class="anim m-card bg-white border border-line rounded-2xl p-7" style="--d:.55s">
+            <p class="text-[10px] font-bold tracking-[0.3em] uppercase text-muted">Month 4+ · Scaling</p>
+            <p class="font-display font-bold text-3xl mt-3 text-accent">$4.5–6k</p>
+            <p class="mt-3 text-sm text-muted leading-relaxed">Increase winning campaigns +30–50%. Build lookalike audiences from closed clients. LinkedIn gets tested only if Meta lead quality stalls.</p>
+          </div>
+        </div>
+
+        <div class="anim border-l-2 border-accent pl-6 mt-8" style="--d:.65s">
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">Break-even math:</span> at a $12.5k average contract, <span class="text-accent font-semibold">one closed client every 4+ months</span> covers the entire media budget. The forecast says ~2 per month.</p>
+        </div>
+
+        <div class="anim plain mt-6" style="--d:.75s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">The rhythm in one line:</span> month 1 we stay steady and let the algorithms learn; months 2–3 we cut what's weak; from month 4 we only pour more money into what already earns. We never scale a losing ad.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 · LAUNCH -->
+  <section class="slide">
+    <div class="slide-scroll px-6 md:px-12 py-24">
+      <div class="max-w-5xl mx-auto">
+        <p class="anim flex items-center gap-3 text-[11px] font-semibold tracking-[0.4em] uppercase text-muted" style="--d:.05s"><span class="h-px w-10 bg-accent"></span> 11 · Launch Sequence</p>
+        <h2 class="split font-display font-bold tracking-tight text-4xl md:text-6xl mt-5">From plan to <em>live campaigns.</em></h2>
+        <div class="draw h-px bg-ink/10 mt-7"></div>
+
+        <div class="grid md:grid-cols-2 gap-x-10 gap-y-5 mt-12">
+          <div class="anim flex items-start gap-4" style="--d:.2s"><span class="font-display font-bold text-accent">1</span><p class="text-sm text-muted leading-relaxed pt-0.5">Install tracking — the Meta Pixel + <span class="tip" data-tip="Conversions API — a server-side tracker that makes conversion data more accurate than the browser pixel alone." tabindex="0">CAPI</span> and the Google tag — so every inquiry is counted.</p></div>
+          <div class="anim flex items-start gap-4" style="--d:.27s"><span class="font-display font-bold text-accent">2</span><p class="text-sm text-muted leading-relaxed pt-0.5">Produce 3 creative variations per campaign — portrait, IR thermal image, 3D site scroll-video.</p></div>
+          <div class="anim flex items-start gap-4" style="--d:.34s"><span class="font-display font-bold text-accent">3</span><p class="text-sm text-muted leading-relaxed pt-0.5">Build Google keyword campaigns A/B/C with negative lists and Southwest geo targets.</p></div>
+          <div class="anim flex items-start gap-4" style="--d:.41s"><span class="font-display font-bold text-accent">4</span><p class="text-sm text-muted leading-relaxed pt-0.5">Launch both channels at the $1,500 + $1,500 split — learning phase left undisturbed.</p></div>
+          <div class="anim flex items-start gap-4" style="--d:.48s"><span class="font-display font-bold text-accent">5</span><p class="text-sm text-muted leading-relaxed pt-0.5">Day-14 checkpoint: cost per inquiry vs benchmark, creative fatigue, search-term cleanup.</p></div>
+          <div class="anim flex items-start gap-4" style="--d:.55s"><span class="font-display font-bold text-accent">6</span><p class="text-sm text-muted leading-relaxed pt-0.5">Day-30 report: pipeline value, return by channel, Month-2 reallocation plan.</p></div>
+        </div>
+
+        <div class="anim plain mt-10" style="--d:.62s">
+          <span class="p-icon"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 0 0-3.66 10.75c.45.34.66.86.66 1.25h6c0-.39.21-.91.66-1.25A6 6 0 0 0 12 3zM10 21h4"/></svg></span>
+          <p class="text-sm text-muted leading-relaxed"><span class="text-ink font-semibold">What happens next:</span> six small steps and the campaigns are live. First measurable results land within two weeks; a full performance report arrives at day 30 — with clear keep / fix / scale decisions attached.</p>
+        </div>
+
+        <div class="mt-12 text-center">
+          <p class="split font-display font-bold tracking-tight text-3xl md:text-5xl">Let's put the next project <em>under the sun.</em></p>
+          <p class="anim mt-6 text-sm text-muted" style="--d:.6s">Santi&Dale Co. · <span class="text-ink font-semibold">d-shop@gmail.com</span> · +63 993 517 4030 · San Pedro, Laguna PH</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= CONTROLS ================= -->
+<footer class="fixed bottom-0 inset-x-0 z-40">
+  <div class="max-w-[1300px] mx-auto px-6 md:px-10 pb-6 flex items-center justify-between gap-6">
+    <button id="prevBtn" class="ctl flex items-center gap-2 text-sm font-semibold text-muted hover:text-ink" aria-label="Previous slide">
+      <span class="arr-l">←</span> Prev
+    </button>
+    <div id="dotsWrap" class="flex items-center gap-2 flex-wrap justify-center"></div>
+    <button id="nextBtn" class="ctl flex items-center gap-2 text-sm font-bold text-white bg-ink rounded-full px-6 py-3 hover:bg-accent" aria-label="Next slide">
+      Next <span class="arr">→</span>
+    </button>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  const slideNumEl = document.getElementById('slideNum');
+  const slideTotalEl = document.getElementById('slideTotal');
+  const progressBar = document.getElementById('progressBar');
+  const ringFg = document.getElementById('ringFg');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const dotsWrap = document.getElementById('dotsWrap');
+  const fsBtn = document.getElementById('fsBtn');
+  const RING_C = 94.25;
+
+  slideTotalEl.textContent = totalSlides;
+
+  const dotEls = [];
+  for (let di = 0; di < totalSlides; di++){
+    const dotBtn = document.createElement('button');
+    dotBtn.className = 'dot-nav';
+    dotBtn.setAttribute('aria-label', 'Go to slide ' + (di + 1));
+    dotBtn.addEventListener('click', function(){ goToSlide(di); });
+    dotsWrap.appendChild(dotBtn);
+    dotEls.push(dotBtn);
+  }
+
+  function splitHeadings(){
+    document.querySelectorAll('.split').forEach(function(el){
+      const walk = function(node){
+        Array.from(node.childNodes).forEach(function(child){
+          if (child.nodeType === 3){
+            const frag = document.createDocumentFragment();
+            const words = child.textContent.split(/\s+/).filter(Boolean);
+            words.forEach(function(word, wi){
+              const outer = document.createElement('span');
+              outer.className = 'w-outer';
+              const inner = document.createElement('span');
+              inner.className = 'w-inner';
+              inner.style.transitionDelay = Math.min(wi * 55, 550) + 'ms';
+              inner.textContent = word;
+              outer.appendChild(inner);
+              frag.appendChild(outer);
+              frag.appendChild(document.createTextNode(' '));
+            });
+            node.replaceChild(frag, child);
+          } else if (child.nodeType === 1){
+            walk(child);
+          }
+        });
+      };
+      walk(el);
+    });
+  }
+  splitHeadings();
+
+  function runCounters(slideEl){
+    slideEl.querySelectorAll('.counter').forEach(function(counterEl){
+      const targetVal = parseFloat(counterEl.getAttribute('data-target'));
+      const decimals = parseInt(counterEl.getAttribute('data-decimals') || '0', 10);
+      const startT = performance.now();
+      const duration = 1500;
+      function tick(now){
+        const p = Math.min((now - startT) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = targetVal * eased;
+        counterEl.textContent = decimals > 0 ? val.toFixed(decimals) : Math.round(val).toLocaleString('en-US');
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      counterEl.textContent = decimals > 0 ? (0).toFixed(decimals) : '0';
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function goToSlide(idx){
+    if (idx < 0 || idx >= totalSlides || idx === currentSlide) return;
+    const dirForward = idx > currentSlide;
+    slides[currentSlide].classList.remove('active');
+    slides[currentSlide].classList.toggle('prev', dirForward);
+    currentSlide = idx;
+    slides.forEach(function(slideEl, si){
+      if (si !== currentSlide && si < currentSlide) slideEl.classList.add('prev');
+      else slideEl.classList.remove('prev');
+    });
+    slides[currentSlide].classList.add('active');
+    updateChrome();
+    runCounters(slides[currentSlide]);
+    if (slides[currentSlide].id === 'simSlide') updateSim();
+  }
+
+  function updateChrome(){
+    slideNumEl.textContent = String(currentSlide + 1);
+    progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+    ringFg.style.strokeDashoffset = RING_C * (1 - (currentSlide + 1) / totalSlides);
+    dotEls.forEach(function(dotEl, di){ dotEl.classList.toggle('active', di === currentSlide); });
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === totalSlides - 1;
+  }
+
+  prevBtn.addEventListener('click', function(){ goToSlide(currentSlide - 1); });
+  nextBtn.addEventListener('click', function(){ goToSlide(currentSlide + 1); });
+
+  window.addEventListener('keydown', function(ev){
+    const onInput = ev.target && ev.target.tagName === 'INPUT';
+    if (onInput) return;
+    if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown'){ ev.preventDefault(); goToSlide(currentSlide + 1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp'){ ev.preventDefault(); goToSlide(currentSlide - 1); }
+    else if (ev.key === 'Home'){ goToSlide(0); }
+    else if (ev.key === 'End'){ goToSlide(totalSlides - 1); }
+    else if (ev.key === 'f' || ev.key === 'F'){ toggleFullscreen(); }
+  });
+
+  let touchStartX = 0, touchStartY = 0;
+  window.addEventListener('touchstart', function(ev){
+    touchStartX = ev.changedTouches[0].clientX;
+    touchStartY = ev.changedTouches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', function(ev){
+    const dx = ev.changedTouches[0].clientX - touchStartX;
+    const dy = ev.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4){
+      if (dx < 0) goToSlide(currentSlide + 1);
+      else goToSlide(currentSlide - 1);
+    }
+  }, { passive: true });
+
+  function toggleFullscreen(){
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+    else document.exitFullscreen();
+  }
+  fsBtn.addEventListener('click', toggleFullscreen);
+
+  /* ================= BUDGET SIMULATOR ================= */
+  const budgetRange = document.getElementById('budgetRange');
+  const splitRange = document.getElementById('splitRange');
+  const presetBtns = Array.from(document.querySelectorAll('.preset'));
+
+  function computeModel(total, metaShare){
+    const Bm = total * metaShare / 100;
+    const Bg = total - Bm;
+    const metaLeads = Bm * 0.7 / 42 + Bm * 0.2 / 60;
+    const metaImp = Bm / 14.3 * 1000;
+    const metaClicks = metaImp * 0.011;
+    const gSearchB = Bg * 0.7, gDispB = Bg * 0.2, gBrandB = Bg * 0.1;
+    const gClicks = gSearchB / 4.5 + gDispB / 2.0 + gBrandB / 1.2;
+    const gImp = (gSearchB / 4.5) / 0.045 + gDispB / 6 * 1000;
+    const gLeads = gSearchB / 87.5 + gDispB / 75 + gBrandB / 50;
+
+    const impressions = metaImp + gImp;
+    const clicks = metaClicks + gClicks;
+    const leads = metaLeads + gLeads;
+    const mql = leads * 0.40;
+    const meetings = mql * 0.45;
+    const clients = meetings * 0.25;
+    const revenue = clients * 12500;
+    return { impressions: impressions, clicks: clicks, leads: leads, mql: mql, meetings: meetings, clients: clients, revenue: revenue, cpl: leads > 0 ? total / leads : 0, roas: total > 0 ? revenue / total : 0 };
+  }
+
+  const refMax = computeModel(8000, 50);
+
+  const fmtInt = function(v){ return Math.round(v).toLocaleString('en-US'); };
+  const fmtDollar = function(v){ return '$' + Math.round(v).toLocaleString('en-US'); };
+  const fmtDec1 = function(v){ return v.toFixed(1); };
+
+  function tweenNum(el, to, fmt){
+    const from = parseFloat(el.dataset.v || '0');
+    el.dataset.v = String(to);
+    const startT = performance.now();
+    const duration = 550;
+    function step(now){
+      const p = Math.min((now - startT) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(from + (to - from) * eased);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function paintRange(el){
+    const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+    const p = (val - min) / (max - min) * 100;
+    el.style.background = 'linear-gradient(to right, #FF6B2C ' + p + '%, #E3E1D8 ' + p + '%)';
+  }
+
+  function updateSim(){
+    const total = parseFloat(budgetRange.value);
+    const metaShare = parseFloat(splitRange.value);
+    const r = computeModel(total, metaShare);
+
+    paintRange(budgetRange);
+    paintRange(splitRange);
+
+    tweenNum(document.getElementById('simBudgetVal'), total, fmtInt);
+    document.getElementById('simMetaPct').textContent = Math.round(metaShare);
+    document.getElementById('simGooglePct').textContent = Math.round(100 - metaShare);
+
+    const metaAlloc = total * metaShare / 100;
+    const googleAlloc = total - metaAlloc;
+    document.getElementById('allocMeta').style.width = metaShare + '%';
+    document.getElementById('allocGoogle').style.width = (100 - metaShare) + '%';
+    document.getElementById('allocMetaVal').textContent = fmtDollar(metaAlloc);
+    document.getElementById('allocGoogleVal').textContent = fmtDollar(googleAlloc);
+
+    tweenNum(document.getElementById('oImp'), r.impressions, fmtInt);
+    tweenNum(document.getElementById('oClick'), r.clicks, fmtInt);
+    tweenNum(document.getElementById('oLead'), r.leads, fmtInt);
+    tweenNum(document.getElementById('oMql'), r.mql, fmtInt);
+    tweenNum(document.getElementById('oMeet'), r.meetings, fmtInt);
+    tweenNum(document.getElementById('oClient'), r.clients, fmtDec1);
+
+    const barScale = function(val, ref){ return Math.max(4, Math.min(100, val / ref * 100)); };
+    document.getElementById('oImpBar').style.width = barScale(r.impressions, refMax.impressions) + '%';
+    document.getElementById('oClickBar').style.width = barScale(r.clicks, refMax.clicks) + '%';
+    document.getElementById('oLeadBar').style.width = barScale(r.leads, refMax.leads) + '%';
+    document.getElementById('oMqlBar').style.width = barScale(r.mql, refMax.mql) + '%';
+    document.getElementById('oMeetBar').style.width = barScale(r.meetings, refMax.meetings) + '%';
+    document.getElementById('oClientBar').style.width = barScale(r.clients, refMax.clients) + '%';
+
+    tweenNum(document.getElementById('kCpl'), r.cpl, fmtDollar);
+    tweenNum(document.getElementById('kRev'), r.revenue, fmtDollar);
+    tweenNum(document.getElementById('kRoas'), r.roas, function(v){ return v.toFixed(1) + '×'; });
+
+    presetBtns.forEach(function(btn){
+      btn.classList.toggle('on', parseFloat(btn.getAttribute('data-val')) === total);
+    });
+  }
+
+  budgetRange.addEventListener('input', updateSim);
+  splitRange.addEventListener('input', updateSim);
+  presetBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      budgetRange.value = btn.getAttribute('data-val');
+      updateSim();
+    });
+  });
+
+  updateChrome();
+  runCounters(slides[0]);
+  paintRange(budgetRange);
+  paintRange(splitRange);
+})();
+</script>
+</body>
+</html>
